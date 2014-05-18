@@ -1,4 +1,5 @@
-*** JoKir12  10-12-11 17:13:37 
+*** JoKir02   25-02-11 05:43:46 
+
 ***          Afunc needed 
 *** PAWILK10 03-10-13 23:20:20
 ***          Fix Mfunc so memoedit doesn't endlessly loop, and
@@ -14,6 +15,66 @@
 */
 
 #include "Default.ch"        // Custom commands.
+
+FUNCTION Princhk()
+
+LOCAL npcount, prnscrn  // This must come first !
+
+IF ISPRINTER()                 // Check to see if we need to go on first
+  RETURN .T.
+ENDIF
+
+/*
+mwhere := "P"
+*** npcount := 0
+*** mtrue   := "Y"
+*** prnscrn := SAVESCREEN( 4,10,14,70 )
+
+COMMIT            // clears memory buffer
+SET CONFIRM OFF   // Overcomes need for double keypress when using GETYN
+
+DO WHILE !isprinter()
+***  SETCOLOR(c_hicolor)
+  IF npcount == 0           // Only need box @ start
+    SCROLL( 2,10, 14,70 )
+    @ 2,10 to 14,70 double
+***   ELSE
+***    SCROLL( 2,11, 13,69 )   // Clear box for subsequent messages
+  ENDIF
+  ? CHR(7)
+  ** SETCOLOR(c_hicolor)
+  IF npcount == 0
+    @  4,27 SAY "PRINTING npcount = 0   mwhere "+mwhere
+    @ 12,25 SAY "PRESS ANY KEY TO CONTINUE ..."
+***   ELSEIF npcount > 2
+***    ? CHR(7)
+***    @  4,21 SAY "Should be Printing npcount >2    "+mwhere
+***   ELSE
+***    @  4,21 SAY "Should be Printing count Two mwhere "+mwhere
+  ENDIF
+***  npcount++
+  IF mtrue == "Y" .OR. LASTKEY() == 27
+****    SETCOLOR(c_stdcolor)
+    RESTSCREEN(4,10,14,70,prnscrn)
+    SET CONFIRM ON
+    RETURN .F.
+   ELSE
+    INKEY(1)
+    @ 12,25 SAY "PRESS ANY KEY TO CONTINUE ... mwhere ="+mwhere
+    INKEY( 1)
+  ENDIF
+ENDDO
+
+   SET CONFIRM ON
+***   SETCOLOR(c_stdcolor)
+***   RESTSCREEN(4,10,14,70,prnscrn)
+
+RETURN .T.             // Don't terminate (mtrue = "N")
+
+*/
+*****  End of Princhk()
+
+***-------------------------------------------------------------------------
 
 FUNCTION Afunc( amode, apos, ascr )
 
@@ -102,7 +163,7 @@ FUNCTION PrintselY()
       mwhere := ApGetY( "Do you Want Printer" )
       IF mwhere == "Y"
 
-**** TEST WITHOUT THIS         Princhk()                            // Below
+         Princhk()                            // Below
          @  0, 0
          SET PRINTER TO
          SET DEVICE TO PRINT
@@ -127,70 +188,6 @@ RETURN( mwhere, npl )
             SCROLL()
 */
 
-FUNCTION Princhk()
-
-LOCAL npcount, prnscrn  // This must come first !
-
-IF ISPRINTER()                 // Check to see if we need to go on first
-  RETURN .T.
-ENDIF
-
-npcount := 0
-mtrue   := " "
-prnscrn := SAVESCREEN( 4,10,14,70 )
-
-COMMIT            // clears memory buffer
-SET CONFIRM OFF   // Overcomes need for double keypress when using GETYN
-
-DO WHILE !isprinter()
-***  SETCOLOR(c_hicolor)
-  IF npcount == 0           // Only need box @ start
-    SCROLL( 2,10, 14,70 )
-    @ 2,10 to 14,70 double
-   ELSE
-    SCROLL( 2,11, 13,69 )   // Clear box for subsequent messages
-  ENDIF
-  ? CHR(7)
-  ** SETCOLOR(c_hicolor)
-  IF npcount == 0
-    @  4,27 SAY "TESTING SLOW PRINT"
-***    @  6,27 SAY "PRINTER IS NOT READY !"
-***    @  8,21 SAY "ENSURE THAT PRINTER IS SWITCHED ON"
-***    @ 10,27 SAY "BEFORE PROCEEDING !!!"
-    @ 12,25 SAY "PRESS ANY KEY TO CONTINUE ..."
-   ELSEIF npcount > 2
-    ? CHR(7)
-    @  4,21 SAY "Should be Printing Step Menu"
-***    @  7,21 SAY "PRINTER IS STILL NOT OPERATIONAL -"
-***    @ 10,28 SAY "PLEASE RE-CHECK !!"
-
-***    mtrue := ApGetN( "Do You wish to terminate :" )
-
-   ELSE
-    @  4,21 SAY "Should be Printing Step Menu"
-***    @  7,21 SAY "PRINTER IS STILL NOT OPERATIONAL -"
-***    @ 10,28 SAY "PLEASE RE-CHECK !!"
-  ENDIF
-  npcount++
-  IF mtrue == "Y" .OR. LASTKEY() == 27
-****    SETCOLOR(c_stdcolor)
-    RESTSCREEN(4,10,14,70,prnscrn)
-    SET CONFIRM ON
-    RETURN .F.
-   ELSE
-    INKEY(1)
-    @ 12,25 SAY "PRESS ANY KEY TO CONTINUE ..."
-    INKEY( 2)
-  ENDIF
-ENDDO
-
-   SET CONFIRM ON
-***   SETCOLOR(c_stdcolor)
-   RESTSCREEN(4,10,14,70,prnscrn)
-
-RETURN .T.             // Don't terminate (mtrue = "N")
-
-*****  End of Princhk()
 
 **-------------------------------------------------------------------
 
@@ -334,7 +331,7 @@ FUNCTION Lastused( nl )                         // Display `last-used' date
 
 ***   SCROLL( nl, 2, nl,78 ) 
    @ 21,32 SAY "Last Used "+mdate+LTRIM(myrc);
-                +" "+Control->LastTime
+                +" "+Control->LastTime COLOR "RG+"
 
 RETURN NIL
 
