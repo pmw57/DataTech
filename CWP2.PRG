@@ -1,4 +1,4 @@
-*** JoKir01  26-01-11 07:23:27 
+*** JoKir02   26-02-11 08:58:59 
 
 /* 
    Program.....:              CWP2.PRG
@@ -751,8 +751,11 @@ FUNCTION PartDets( mpartnum )
                ntotal:= nwholesale := 0
                EquSearch( @mmodcode )               // XLF_Equ3 
             ELSE
-               mok := ApGetY( "Do You want to ADD Module" )
+               mok := ApGetN( "Do You want to ADD Module" )
                coperno := SPACE( 8 )
+               IF PressedEsc()
+                  RETURN NIL
+               ENDIF
                IF mok = "Y"
                    ApFLock( 3 )
                   APPEND BLANK
