@@ -1,4 +1,7 @@
-   ***  JoKir10   18-10-11 12:50:07 
+*** JoKir02 19-02-11 07:56:42 
+*** PWilk02 18-02-14 00:40:21   Allow price list to be limited by price. A request
+***                             about limiting appearance of zero values occurs only
+***                             if a difference of $0.00 is chosen.
 
 /* 
    Program.....:                  XLF_EQU.PRG  and   CHRIEQU.PRG
@@ -1577,11 +1580,14 @@ STATIC FUNCTION Modall()
 STATIC FUNCTION ModCost()
 
    mselect := SPACE( 2 )
+   mdiff := 1.00
+   mzero := "Y"
    SCROLL()
-   DISPBOX(  3, 1,10,79, 2 )
+   DISPBOX(  3, 1,12,79, 2 )
    @  4,10 SAY "Prints Module List by Parts Cost and Kit Cost"
    @  6,30 SAY "Blank for ALL" COLOR "R+"
    @  8,10 SAY "Select Modules with First Letters" GET mselect PICTURE "!!"
+   @  10,10 SAY "Price difference to exclude ( 0.00 for none )" GET mdiff PICTURE "99999.99"
    READ 
    IF PressedEsc()
       RETURN NIL
@@ -1589,8 +1595,10 @@ STATIC FUNCTION ModCost()
    SELECT EquDesc
    SET ORDER TO 1                           // Modcode+Partnum
    GOTO TOP
-   mall := ApGetN( "Parts-Kit Cost Not Equal >= $1.00" )
-   mok  := ApGetN( "By Module Description" )
+   IF mdiff == 0
+      mzero := ApGetN( "Include zero prices?" )
+   ENDIF
+   mok  := ApGetN( "Sort by Module Description" )
    IF mok = "Y" 
       ApFLock( 3 )
       INDEX ON EquDesc->Desc TO TempI03
@@ -1611,10 +1619,11 @@ STATIC FUNCTION ModCost()
    @  0,60 SAY STR( DAY(DATE() ),3 )+" "+CMONTH( DATE() );
               +STR( YEAR(DATE() ),5 )
    @ nl, 0 SAY "Module"
-   ***      @ nl,17 SAY "Description  If Difference >= $1.00"
-   @ nl,17 SAY "Description"
-   @ nl,60 SAY "Parts"
-   @ nl,71 SAY "Kit Cost"
+         @ nl,15 SAY "Description"
+         @ nl,45 SAY "Parts"
+         @ nl,52 SAY "Kit Cost"
+         @ nl,66 SAY "Sell"
+         @ nl,74 SAY "Markup"
    nl++
    SELECT EquDesc
    DO WHILE EquDesc->( !EOF() )
@@ -1636,10 +1645,11 @@ STATIC FUNCTION ModCost()
          @  0,60 SAY STR( DAY(DATE() ),3 )+" "+CMONTH( DATE() );
                     +STR( YEAR(DATE() ),5 )
          @ nl, 0 SAY "Module"
-         ***            @ nl,17 SAY "Description  If Difference >= $1.00"
-         @ nl,17 SAY "Description"
-         @ nl,60 SAY "Parts"
-         @ nl,71 SAY "Kit Cost"
+         @ nl,15 SAY "Description"
+         @ nl,45 SAY "Parts"
+         @ nl,52 SAY "Kit Cost"
+         @ nl,66 SAY "Sell"
+         @ nl,74 SAY "Markup"
          nl++
       ENDIF
       mmodcode := EquDesc->Modcode
@@ -1650,8 +1660,10 @@ STATIC FUNCTION ModCost()
       ncost := Part->Trade
       SELECT Part
       ApFLock( 3 )
-      Part->ABC := "M"               // Finds Modules
+       Part->ABC := "M"               // Finds Modules
       UNLOCK
+      nmarkup := Part->Markup
+      nwholesale := Part->Wholesale
       SELECT Equ
       SET EXACT ON
       ntottrade:= nTotWhol := 0
@@ -1736,23 +1748,17 @@ STATIC FUNCTION ModCost()
          ENDDO                       //   mmodcode EOF()
       ENDIF                          // Found mmodcode
       SET EXACT OFF  
-      IF mall = "Y"
-         IF nTotTrade1 != nTotTrade
-            ntotal := ntottrade1-ntottrade
-            IF ntotal >= 1
-               @ nl, 0 SAY EquDesc->Modcode
-               @ nl,17 SAY EquDesc->Desc
-               @ nl,58 SAY nTotTrade  PICTURE "999,999.99"
-               @ nl,69 SAY nTotTrade1 PICTURE "999,999.99"
-               nl++ 
-            ENDIF
+      IF mzero == "Y" .OR. nTotTrade > 0 .OR. nTotTrade1 > 0
+         ntotal := ntottrade1-ntottrade
+         IF ntotal >= mdiff
+            @ nl, 0 SAY SUBSTR( EquDesc->Modcode, 1,12 )
+            @ nl,14 SAY SUBSTR( EquDesc->Desc, 1,35 )
+            @ nl,40 SAY nTotTrade  PICTURE "999,999.99"
+            @ nl,50 SAY nTotTrade1 PICTURE "999,999.99"
+            @ nl,60 SAY nWholesale PICTURE "999,999.99"
+            @ nl,70 SAY nmarkup  PICTURE "999,999.99"
+            nl++ 
          ENDIF
-      ELSE
-         @ nl, 0 SAY EquDesc->Modcode
-         @ nl,17 SAY EquDesc->Desc
-         @ nl,58 SAY nTotTrade  PICTURE "999,999.99"
-         @ nl,69 SAY nTotTrade1 PICTURE "999,999.99"
-         nl++
       ENDIF
       SELECT EquDesc
       SKIP ALIAS EquDesc
@@ -1770,6 +1776,7 @@ STATIC FUNCTION ModCost()
    ENDIF
 
    RETURN NIL
+
    ****---- End of ModCost()
 
    ***---------------------------------------------------------------------*
