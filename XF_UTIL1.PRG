@@ -1,9 +1,13 @@
-***  JoKir12   10-12-11 17:24:06 
+*** JoKir12 10-12-11 17:24:06 
+*** PWilk10 15-12-14 18:19:20 - Update EquAnal to use a more flexible
+***                             technique to search for modules, and
+***                             also removes the 4 level limit too.
 
 /*  Program ......:                  XF_UTIL1.PRG
     Authors.......: John Kirby
     Date..........: 29/09/2013
-    Functions.....: YearCat, YearPart, EquAnal,PartStock, PartABC, CostProf, FindEqu
+    Functions.....: YearCat, YearPart, EquAnal, CheckPage, PartStock, PartABC, CostProf, FindEqu
+    Static funcs..: AnalFindNext, AnalShowMod, AnalAfterMod, AnalShowDetails, AnalShowPart, AnalShowQty
 */
 
 FUNCTION YearCat()
@@ -775,571 +779,361 @@ RETURN NIL
 ***-----------------------------------------------------------------
 
 Function EquAnal()
-     SCROLL()
-     DISPBOX( 0, 1, 24,79, 2 )
-     mpartnum := SPACE( 20 )
-     @ 10,10 SAY "Select Module for Analysis"
-     PartFind( mpartnum )
-     mpartnum := Part->Partnum 
-       mwhere := "S"
-       Printsel( mwhere )
-      nl := 5 
-      npl := 22
-      IF mwhere == "P"
-         npl := 56
-         @  0, 0
-         SET DEVICE TO PRINT
-      ELSE
-         SCROLL()
-      ENDIF
-      @  0, 0 SAY Control->U_Name
-      @  0,46 SAY TIME()
-      @  0,58 SAY STR( DAY(DATE() ),3 )+" "+CMONTH( DATE() );
-                +STR( YEAR(DATE() ),5 )
-      @  3, 2 SAY "Description           Partnum"
-      @  3,60 SAY "Instock"
-      nl := 5        
-   mstock := "Y"
-   mlevel := 5
-   mequ   := "Y"
-         nrecno1:= nrecno2:= nrecno3:= nrecno4 := 0
-         nqty1:= nqty2:= nqty3:= nqty4 := 0
-         nequ1:= nequ2:= nequ3:= nequ4 := 0
-         nquot := Quot->Qty
-         nequqty1:= nequqty2:= nequqty3:= nequqty4 := 0
-         SELECT Equ
-         mmod1 := TRIM( Part->Partnum )
-         SEEK mmod1
-         nequqty1 := Equ->PartQty
-         SELECT Part
-         SEEK mpartnum
-            @ nl, 0 SAY Part->Desc;
-                        +" "+STR( Part->Instock, 9 );
-                        +" "+Part->ABC;
-                        +" "+SUBSTR( Part->Unit, 1, 6 );
-                        +" "+SUBSTR( Part->Partnum, 1,16 )    
-      nl++
-      IF Part->Detail != "      "
-         @  nl,20 SAY Part->Detail
-         nl++
-      ENDIF
-/*
-      IF Part->Detail1 != "      "
-         @  nl,10 SAY Part->Detail1
-         nl++
-      ENDIF
-      IF Part->Detail2 != "      "
-         @  nl,10 SAY Part->Detail2
-         nl++
-      ENDIF
-      IF Part->Detail3 != "      "
-         @  nl,10 SAY Part->Detail3
-         nl++
-      ENDIF
-*/
-          nl++
-     IF mlevel >= 1
-         SELECT Equ
-         GOTO TOP
-         SET EXACT ON
-         mmod1 := TRIM( Part->Partnum )
-         SEEK mmod1
-         IF FOUND()   
-            DO WHILE Equ->Modcode = mmod1 .AND. Equ->( !EOF() )
-               IF nl > npl
-                  IF mwhere = "P"
-                     EJECT
-                     nl := 0
-                   ENDIF
-               ENDIF
-               IF mwhere = "S"
-                  IF nl > 22
-                     WAIT
-                     SCROLL()
-                     nl := 0
-                  ENDIF
-               ENDIF
-               SELECT Part
-               SEEK Equ->Partnum
-               nqty1:= nequqty1 := Equ->PartQty
-               @ nl, 0 SAY "."
-               @ nl, 3 SAY SUBSTR( Part->Desc, 1,29 );
-                        +" "+STR( Part->Instock, 9 );
-                        +" "+Part->ABC;
-                        +" "+SUBSTR( Part->Unit, 1, 6 );
-                        +" "+SUBSTR( Part->Partnum, 1,16 )    
-               nl++
-      IF Part->Detail != "      "
-         @  nl,20 SAY Part->Detail
-         nl++
-      ENDIF
-         SELECT Equ
-         mpartnum := Equ->Partnum
-         mseek := Equ->ModSeqno+mpartnum
-         mmod2 := TRIM( Equ->Partnum )
-         nrecno2 := RECNO() 
-     IF mequ = "Y"
-         GOTO TOP
-         SEEK mmod2
-         IF FOUND()   
-            IF mlevel >= 2
-            DO WHILE Equ->Modcode = mmod2 .AND. Equ->( !EOF() )
-               IF nl > npl
-                  IF mwhere = "P"
-                     EJECT
-                     nl := 0  
-                   ENDIF
-               ENDIF
-               IF mwhere = "S"
-                  IF nl > 22
-                     INKEY( 0 )
-                     SCROLL()
-                     nl := 0
-                  ENDIF
-               ENDIF
-               nqty2 := Equ->PartQty
-               nequqty2 := Equ->Partqty*nequqty1
-               SELECT Part
-               SEEK Equ->Partnum
-               @ nl, 0 SAY ".."
-               @ nl, 4 SAY SUBSTR( Equ->Partnum, 1,16 );
-                      +"   "+STR( nequqty2, 8, 2 )+" "+SUBSTR( Part->Unit, 1, 6);
-                        +" "+SUBSTR( Part->Desc, 1,29 );
-                        +" "+STR( Part->Instock,6)+" "+Part->ABC
-               nl++
-         SELECT Equ
-         mpartnum := Equ->Partnum
-         mseek := Equ->ModSeqno+mpartnum
-         mlevel := 4
-     IF mlevel >= 3
-         mmod3 := TRIM( Equ->Partnum )
-         nrecno3 := RECNO() 
-         GOTO TOP
-         SEEK mmod3
-         IF FOUND()   
-            DO WHILE Equ->Modcode = mmod3 .AND. Equ->( !EOF() )
-               nqty3 := Equ->PartQty
-               nequqty3 := Equ->PartQty*nequqty2
-  ****             nequ3 := nqty1 * nqty2 * nqty3 * nquot
-               IF nl > npl
-                  IF mwhere = "P"
-                     EJECT
-                     nl := 0 
-                  ENDIF
-               ENDIF
-               IF mwhere = "S"
-                  IF nl > 22
-                     INKEY( 0 )
-                     SCROLL()
-                     nl := 0
-                  ENDIF
-               ENDIF
-               SELECT Part
-               SEEK Equ->Partnum
-               @ nl, 0 SAY "..."
-               @ nl, 5 SAY SUBSTR( Equ->Partnum, 1,16 );
-                       +"  "+STR( nequqty3, 8, 2 )+" "+SUBSTR( Part->Unit, 1, 6);
-                       +" "+SUBSTR( Part->Desc, 1,28 );
-                       +" "+STR( Part->Instock,6)+" "+Part->ABC
-               nl++
-         SELECT Equ
-         mpartnum := Equ->Partnum
-         mseek := Equ->ModSeqno+mpartnum
-         mlevel = 4
-        IF mlevel = 4
-            SELECT Equ
-            mmod4   := TRIM( Equ->Partnum )
-            nrecno4 := RECNO()
-            GOTO TOP
-            SEEK mmod4
-            IF FOUND()
-               DO WHILE  Equ->Modcode = mmod4 .AND. Equ->( !EOF() )
-                  nqty4 := Equ->PartQty
-                  nequqty4 := nequqty3*Equ->PartQty
-***                  nequ4 := nqty1 * nqty2 * nqty3 * nqty4 * nquot
-               IF nl > npl
-                  IF mwhere = "P"
-                     EJECT
-                     nl := 0  
-                   ENDIF
-               ENDIF
-               IF mwhere = "S"
-                  IF nl > 22
-                     INKEY( 0 )
-                     SCROLL()
-                     nl := 0
-                  ENDIF
-               ENDIF
-               SELECT Part
-               SEEK Equ->Partnum
-               @ nl, 0 SAY "...."
-                 @ nl, 6 SAY SUBSTR( Equ->Partnum, 1,16 );
-                      +" "+STR( nequqty4, 8, 2 )+" "+SUBSTR( Part->Unit, 1, 6);
-                      +" "+SUBSTR( Part->Desc, 1,28 );
-                      +" "+STR( Part->Instock,6 )+" "+Part->ABC
-               nl++
-         SELECT Equ
-                  SKIP ALIAS Equ
-                ENDDO                       //  mmod4
-             ENDIF                          
-   ENDIF                                   // mlevel = 4                
-               SELECT Equ 
-               GOTO nrecno4
-               SKIP ALIAS Equ
-             ENDDO                       //  mmod3
-          ENDIF                          // FOUND()  mmod3    
-   ENDIF                                 // mlevel = 3
-               SELECT Equ
-               GOTO nrecno3
-               SKIP ALIAS Equ
-            ENDDO                       //  mmod2 EOF()
-            nl++
-         ENDIF                         // Found mmod2
-   ENDIF
-   ENDIF                   //   mequ Only first
-               SELECT Equ
-               GOTO nrecno2
-               SKIP ALIAS Equ
-               ENDDO                       //   mmod1 EOF()
-            ENDIF                          // Found mmod1
-   ENDIF                                   // mlevel = 1
-            SET EXACT OFF      
-         nl++
-      IF mwhere = "P"
-***         IF Message->Mess13 != SPACE( 40 )   
-***            @ nl,26 SAY Message->Mess13
-***            nl++
-***         ENDIF
-         @ nl, 0 SAY "Qty      MATERIALS                         Price       Date     Hours"
-         nl++
-         npl := nl
-         nline = 1
-         FOR nline = 1 TO ( 60-npl )           // Was 63
-         @ nl, 0 SAY "______:___________________________________:__________:_________:___________"
-           nl+=2
-           IF nl >60
-             EXIT
-           ENDIF
-           npl++ 
-         NEXT
-      ENDIF 
-***********************
-      IF mwhere = "P"
-         @ nl, 0 SAY " "
-         EndPrint()
-        ELSE
-         IF nl > 5
+    SCROLL()
+    DISPBOX( 0, 1, 24,79, 2 )
+    mpartnum := SPACE( 20 )
+    @ 10,10 SAY "Select Module for Analysis"
+    PartFind( mpartnum )
+    mpartnum := Part->Partnum 
+    
+    mwhere := "S"
+    Printsel( mwhere )
+    nl := 5 
+    npl := 22
+    IF mwhere == "P"
+        npl := 56
+        @  0, 0
+        SET DEVICE TO PRINT
+    ELSE
+        SCROLL()
+    ENDIF
+
+    @  0, 0 SAY Control->U_Name
+    @  0,46 SAY TIME()
+    @  0,58 SAY STR( DAY(DATE() ),3 )+" "+CMONTH( DATE() );
+        +STR( YEAR(DATE() ),5 )
+    @  3, 2 SAY "Description           Partnum"
+    @  3,60 SAY "Instock"
+    
+    mlevel := 4
+    nl := 5        
+
+    @ nl, 0 SAY Part->Desc;
+        +" "+STR( Part->Instock, 9 );
+        +" "+Part->ABC;
+        +" "+SUBSTR( Part->Unit, 1, 6 );
+        +" "+SUBSTR( Part->Partnum, 1,16 )    
+    nl++
+    IF Part->Detail != "      "
+        @  nl,20 SAY Part->Detail
+        nl++
+    ENDIF
+    nl++
+
+    SELECT Equ
+    SEEK TRIM( Part->Partnum )
+    
+    SET EXACT ON
+    AnalFindNext(Equ->PartQty, 1)
+    SET EXACT OFF
+    nl++
+
+    IF mwhere = "P"
+        @ nl, 0 SAY "Qty      MATERIALS                         Price       Date     Hours"
+        nl++
+        npl := nl
+        nline = 1
+        FOR nline = 1 TO ( 60-npl )           // Was 63
+            @ nl, 0 SAY "______:___________________________________:__________:_________:___________"
+            nl+=2
+            IF nl >60
+                EXIT
+            ENDIF
+            npl++ 
+        NEXT
+        @ nl, 0 SAY " "
+        EndPrint()
+    ELSE
+        IF nl > 5
             WAIT
-         ENDIF
-         mok := "N"
-         DO WHILE mok = "N"
+        ENDIF
+        mok := "N"
+        DO WHILE mok = "N"
             mok := ApReadN()
-         ENDDO
-      ENDIF
-RETURN NIL
+        ENDDO
+    ENDIF
+    
+    RETURN NIL
 
 
 ****------- End EquAnal
 
+FUNCTION CheckPage()
+    IF mwhere = "P" .AND. nl > npl
+        EJECT
+        nl := 0  
+    ENDIF
+    IF mwhere = "S" .AND. nl > 22
+        INKEY( 0 )
+        SCROLL()
+        nl := 0
+    ENDIF
+
+    RETURN NIL
+
+STATIC FUNCTION AnalFindNext(nequqty, level)
+    local mmod := 0
+    local nrecno := 0
+
+    IF mlevel >= level
+        mmod := TRIM( Part->Partnum )
+        SELECT Equ
+        nrecno := RECNO() 
+        GOTO TOP
+        SEEK mmod
+        IF FOUND()   
+            AnalShowMod(mmod, nequqty, level)
+        ENDIF
+    ENDIF //   mequ Only first
+    SELECT Equ
+    GOTO nrecno
+
+    RETURN NIL
+
+STATIC FUNCTION AnalShowMod(mmod, nequqty, level)
+    DO WHILE Equ->Modcode = mmod .AND. Equ->( !EOF() )
+        CheckPage()
+        SELECT Part
+        AnalShowDetails(level, Equ->PartQty * nequqty)
+        SEEK Equ->Partnum
+        AnalFindNext(Equ->PartQty * nequqty, level + 1)
+        SKIP ALIAS Equ
+    ENDDO
+    AnalAfterShow(level)
+
+    RETURN NIL
+
+STATIC FUNCTION AnalShowDetails(level, nequqty)
+    IF level == 1
+        AnalShowPart(1)
+    ELSE
+        AnalShowQty(level, nequqty)
+    ENDIF
+    
+    RETURN NIL
+
+STATIC FUNCTION AnalShowPart(level)
+    @ nl, 0 SAY REPLICATE(".", level)
+    @ nl, 3 SAY SUBSTR( Part->Desc, 1,29 );
+        +" "+STR( Part->Instock, 9 );
+        +" "+Part->ABC;
+        +" "+SUBSTR( Part->Unit, 1, 6 );
+        +" "+SUBSTR( Part->Partnum, 1,16 )    
+    nl++
+    IF Part->Detail != "      "
+        @  nl,20 SAY Part->Detail
+        nl++
+    ENDIF
+
+    RETURN NIL
+
+STATIC FUNCTION AnalShowQty(level, qty)
+    @ nl, 0 SAY REPLICATE(".", level)
+    @ nl, 6 SAY SUBSTR( Part->Partnum, 1,16 );
+        +" "+STR( qty, 8, 2 )+" "+SUBSTR( Part->Unit, 1, 6);
+        +" "+SUBSTR( Part->Desc, 1, 29 );
+        +" "+STR( Part->Instock, 6 )+" "+Part->ABC
+    nl++
+
+    RETURN NIL
+
+STATIC FUNCTION AnalAfterShow(level)
+    IF level == 2
+        nl++
+    ENDIF
+
+    RETURN NIL
+
 ****-----------------------------------------------------------------------
 
 Function FindEqu()
-        SCROLL()
-      mcodeno := Quot->Codeno
-      aPart_ :={}
-      anum   :={}
-      nrecno := 0
-      SELECT Quot
-      GOTO TOP
-      DO WHILE Quot->( !EOF() )
-          IF Quot->Codeno = "A       "
-             SKIP ALIAS Quot
-             LOOP
-          ENDIF
-          IF Quot->Codeno != mcodeno
-             SKIP ALIAS Quot
-             LOOP
-          ENDIF
-          ddate := STR( YEAR( Quot->Duedate ) );
-                  +STR( MONTH( Quot->DueDate ) );
-                  +STR( DAY( Quot->DueDate ) );
-                  +" "+Quot->Faxno
-          AADD( aPart_,Quot->Codeno;
-              +" "+Quot->BranchId;
-              +" "+STR( Quot->OrgQty, 6, 0 );
-              +" "+STR( Quot->Qty, 6, 0 );
-              +" "+STR( Quot->Goodsent, 6, 0 );
-              +" "+SUBSTR( Quot->Partnum, 1, 8 );
-              +" "+SUBSTR( Quot->Ordnum, 1,16 );
-              +" "+ddate;
-              +"               "+STR( RECNO(),6 ) )
-      SKIP ALIAS Quot
-   ENDDO
-   DISPBOX( 0, 1, 24,79, 2 )
-   @  1, 3 SAY " Name List " COLOR "RG+" 
-   IF !EMPTY( aPart_ )
-      ASORT(aPart_,,,{ | x,y | x < y })
-      anum := ACHOICE( 3, 2, 23,78, aPart_,,"AFUNC" )
-      nrecno := VAL( RIGHT( aPart_[anum],6 ) )
-      GOTO nrecno
-      IF LASTKEY() = 27
-         RETURN
-      ENDIF
-   ENDIF     // Empty
-   SELECT NAME
-   SEEK Quot->Codeno
+    SET EXACT ON
 
-       mwhere := "S"
-       Printsel( mwhere )
-      nl := 5 
-      npl := 22
-      IF mwhere == "P"
-         npl := 56
-         @  0, 0
-         SET DEVICE TO PRINT
-      ELSE
-         SCROLL()
-      ENDIF
-      @  0, 0 SAY Control->U_Name
-      @  0,46 SAY TIME()
-      @  0,58 SAY STR( DAY(DATE() ),3 )+" "+CMONTH( DATE() );
-                +STR( YEAR(DATE() ),5 )
-      @  2,20SAY Name->Name
-      @  3, 2 SAY "Partnum   Description  Suppl"
-      @  3,70 SAY "Instock"
-      nl := 5        
-   mpartnum := Quot->Partnum
-   mstock := "Y"
-   mlevel := 5
-   mequ   := "Y"
-   SELECT Quot
-   DO WHILE Quot->( !EOF() )
-       IF Quot->Partnum != mpartnum
-          SKIP ALIAS Quot
-          LOOP
-       ENDIF
-         nrecno1:= nrecno2:= nrecno3:= nrecno4 := 0
-         nqty1:= nqty2:= nqty3:= nqty4 := 0
-         nequ1:= nequ2:= nequ3:= nequ4 := 0
-         nquot := Quot->Qty
-         nequqty1:= nequqty2:= nequqty3:= nequqty4 := 0
-         SELECT Equ
-         mmod1 := TRIM( Quot->Partnum )
-         SEEK mmod1
-         nequqty1 := Equ->PartQty
-         SELECT Part
-         SEEK Quot->Partnum
-            @ nl, 0 SAY SUBSTR( Quot->Partnum, 1,16 );    
-                   +" "+STR( Quot->Qty, 8, 3 )+" "+SUBSTR( Part->Unit, 1, 6 );
-                        +" "+Part->Desc+" "+Part->ABC
-            nl+=2
-            mpartnum := Quot->Partnum
-     IF mlevel >= 1
-         SELECT Equ
-         GOTO TOP
-         SET EXACT ON
-         mmod1 := TRIM( Quot->Partnum )
-         SEEK mmod1
-         IF FOUND()   
-            DO WHILE Equ->Modcode = mmod1 .AND. Equ->( !EOF() )
-               IF nl > npl
-                  IF mwhere = "P"
-                     EJECT
-                     nl := 0
-                   ENDIF
-               ENDIF
-               IF mwhere = "S"
-                  IF nl > 22
-                     INKEY( 0 )
-                     SCROLL()
-                     nl := 0
-                  ENDIF
-               ENDIF
-               SELECT Part
-               SEEK Equ->Partnum
-               nqty1:= nequqty1 := Equ->PartQty
-               nequ1 := nqty1* nquot
-               @ nl, 0 SAY "."
-               @ nl, 3 SAY SUBSTR( Equ->Partnum, 1,16 );
-                      +"    "+STR( nequ1, 8, 2 )+" "+SUBSTR( Part->Unit, 1, 6);
-                        +" "+SUBSTR( Part->Desc, 1,19 );
-                        +" "+Part->Codeno;
-                        +" "+STR( Part->Instock,6)+" "+Part->ABC
-               nl++
-         SELECT Equ
-         mpartnum := Equ->Partnum
-         mseek := Equ->ModSeqno+mpartnum
-         mmod2 := TRIM( Equ->Partnum )
-         nrecno2 := RECNO() 
-     IF mequ = "Y"
-         GOTO TOP
-         SEEK mmod2
-         IF FOUND()   
-            IF mlevel >= 2
-            DO WHILE Equ->Modcode = mmod2 .AND. Equ->( !EOF() )
-               IF nl > npl
-                  IF mwhere = "P"
-                     EJECT
-                     nl := 0  
-                   ENDIF
-               ENDIF
-               IF mwhere = "S"
-                  IF nl > 22
-                     INKEY( 0 )
-                     SCROLL()
-                     nl := 0
-                  ENDIF
-               ENDIF
-               nqty2 := Equ->PartQty
-               nequ2 := ( nqty1 * nqty2 )* nquot
-               nequqty2 := Equ->Partqty*nequqty1
-               SELECT Part
-               SEEK Equ->Partnum
-               @ nl, 0 SAY ".."
-               @ nl, 4 SAY SUBSTR( Equ->Partnum, 1,16 );
-                      +"   "+STR( nequ2, 8, 2 )+" "+SUBSTR( Part->Unit, 1, 6);
-                        +" "+SUBSTR( Part->Desc, 1,19 );
-                        +" "+Part->Codeno;
-                        +" "+STR( Part->Instock,6)+" "+Part->ABC
-               nl++
-         SELECT Equ
-         mpartnum := Equ->Partnum
-         mseek := Equ->ModSeqno+mpartnum
-         mlevel := 4
-     IF mlevel >= 3
-         mmod3 := TRIM( Equ->Partnum )
-         nrecno3 := RECNO() 
-         GOTO TOP
-         SEEK mmod3
-         IF FOUND()   
-            DO WHILE Equ->Modcode = mmod3 .AND. Equ->( !EOF() )
-               nqty3 := Equ->PartQty
-               nequqty3 := Equ->PartQty*nequqty2
-               nequ3 := nqty1 * nqty2 * nqty3 * nquot
-               IF nl > npl
-                  IF mwhere = "P"
-                     EJECT
-                     nl := 0 
-                  ENDIF
-               ENDIF
-               IF mwhere = "S"
-                  IF nl > 22
-                     INKEY( 0 )
-                     SCROLL()
-                     nl := 0
-                  ENDIF
-               ENDIF
-               SELECT Part
-               SEEK Equ->Partnum
-               @ nl, 0 SAY "..."
-               @ nl, 5 SAY SUBSTR( Equ->Partnum, 1,16 );
-                       +"  "+STR( nequ3, 8, 2 )+" "+SUBSTR( Part->Unit, 1, 6);
-                       +" "+SUBSTR( Part->Desc, 1,18 );
-                       +" "+Part->Codeno;
-                       +" "+STR( Part->Instock,6)+" "+Part->ABC
-               nl++
-         SELECT Equ
-         mpartnum := Equ->Partnum
-         mseek := Equ->ModSeqno+mpartnum
-         mlevel = 4
-        IF mlevel = 4
-            SELECT Equ
-            mmod4   := TRIM( Equ->Partnum )
-            nrecno4 := RECNO()
-            GOTO TOP
-            SEEK mmod4
-            IF FOUND()
-               DO WHILE  Equ->Modcode = mmod4 .AND. Equ->( !EOF() )
-                  nqty4 := Equ->PartQty
-                  nequqty4 := nequqty3*Equ->PartQty
-                  nequ4 := nqty1 * nqty2 * nqty3 * nqty4 * nquot
-               IF nl > npl
-                  IF mwhere = "P"
-                     EJECT
-                     nl := 0  
-                   ENDIF
-               ENDIF
-               IF mwhere = "S"
-                  IF nl > 22
-                     INKEY( 0 )
-                     SCROLL()
-                     nl := 0
-                  ENDIF
-               ENDIF
-               SELECT Part
-               SEEK Equ->Partnum
-               @ nl, 0 SAY "...."
-                 @ nl, 6 SAY SUBSTR( Equ->Partnum, 1,16 );
-                      +" "+STR( nequ4, 8, 2 )+" "+SUBSTR( Part->Unit, 1, 6);
-                      +" "+SUBSTR( Part->Desc, 1,18 );
-                      +" "+Part->Codeno;
-                      +" "+STR( Part->Instock,6 )+" "+Part->ABC
-               nl++
-         SELECT Equ
-                  SKIP ALIAS Equ
-                ENDDO                       //  mmod4
-             ENDIF                          
-   ENDIF                                   // mlevel = 4                
-               SELECT Equ 
-               GOTO nrecno4
-               SKIP ALIAS Equ
-             ENDDO                       //  mmod3
-          ENDIF                          // FOUND()  mmod3    
-   ENDIF                                 // mlevel = 3
-               SELECT Equ
-               GOTO nrecno3
-               SKIP ALIAS Equ
-            ENDDO                       //  mmod2 EOF()
-            nl++
-         ENDIF                         // Found mmod2
-   ENDIF
-   ENDIF                   //   mequ Only first
-               SELECT Equ
-               GOTO nrecno2
-               SKIP ALIAS Equ
-               ENDDO                       //   mmod1 EOF()
-            ENDIF                          // Found mmod1
-   ENDIF                                   // mlevel = 1
-            SET EXACT OFF      
-         nl++
-         SELECT Quot
-         SKIP ALIAS Quot
-      ENDDO                            //   EOF() Quot
-      IF mwhere = "P"
-         IF Message->Mess13 != SPACE( 40 )   
+    SCROLL()
+    mcodeno := Quot->Codeno
+    aPart_ :={}
+    anum   :={}
+    nrecno := 0
+    SELECT Quot
+    GOTO TOP
+    DO WHILE Quot->( !EOF() )
+        IF Quot->Codeno = "A       "
+            SKIP ALIAS Quot
+            LOOP
+        ENDIF
+        IF Quot->Codeno != mcodeno
+            SKIP ALIAS Quot
+            LOOP
+        ENDIF
+        ddate := STR( YEAR( Quot->Duedate ) );
+            +STR( MONTH( Quot->DueDate ) );
+            +STR( DAY( Quot->DueDate ) );
+            +" "+Quot->Faxno
+        AADD( aPart_,Quot->Codeno;
+            +" "+Quot->BranchId;
+            +" "+STR( Quot->OrgQty, 6, 0 );
+            +" "+STR( Quot->Qty, 6, 0 );
+            +" "+STR( Quot->Goodsent, 6, 0 );
+            +" "+SUBSTR( Quot->Partnum, 1, 8 );
+            +" "+SUBSTR( Quot->Ordnum, 1,16 );
+            +" "+ddate;
+            +"               "+STR( RECNO(),6 ) )
+        SKIP ALIAS Quot
+    ENDDO
+    DISPBOX( 0, 1, 24,79, 2 )
+    @  1, 3 SAY " Name List " COLOR "RG+" 
+    IF !EMPTY( aPart_ )
+        ASORT(aPart_,,,{ | x,y | x < y })
+        anum := ACHOICE( 3, 2, 23,78, aPart_,,"AFUNC" )
+        nrecno := VAL( RIGHT( aPart_[anum],6 ) )
+        GOTO nrecno
+        IF LASTKEY() = 27
+            RETURN
+        ENDIF
+    ENDIF     // Empty
+    SELECT NAME
+    SEEK Quot->Codeno
+
+    mwhere := "S"
+    Printsel( mwhere )
+    nl := 5 
+    npl := 22
+    IF mwhere == "P"
+        npl := 56
+        @  0, 0
+        SET DEVICE TO PRINT
+    ELSE
+        SCROLL()
+    ENDIF
+    @  0, 0 SAY Control->U_Name
+    @  0,46 SAY TIME()
+    @  0,58 SAY STR( DAY(DATE() ),3 )+" "+CMONTH( DATE() );
+        +STR( YEAR(DATE() ),5 )
+    @  2,20SAY Name->Name
+    @  3, 2 SAY "Partnum   Description  Suppl"
+    @  3,70 SAY "Instock"
+    nl := 5        
+    mpartnum := Quot->Partnum
+    mstock := "Y"
+    mlevel := 4
+    SELECT Quot
+    DO WHILE Quot->( !EOF() )
+        IF Quot->Partnum != mpartnum
+            SKIP ALIAS Quot
+            LOOP
+        ENDIF
+        
+        SELECT Equ
+        SEEK Quot->Partnum
+        mpartnum := Equ->Partnum
+        
+        SELECT Part
+        SEEK Quot->Partnum
+        @ nl, 0 SAY SUBSTR( Quot->Partnum, 1,16 );    
+            +" "+STR( Quot->Qty, 8, 3 )+" "+SUBSTR( Part->Unit, 1, 6 );
+            +" "+Part->Desc+" "+Part->ABC
+        nl+=2
+        
+        EquFindNext(Quot->Qty, 1)
+        nl++
+        
+        SELECT Quot
+        SKIP ALIAS Quot
+    ENDDO                            //   EOF() Quot
+
+    IF mwhere = "P"
+        IF Message->Mess13 != SPACE( 40 )   
             @ nl,26 SAY Message->Mess13
             nl++
-         ENDIF
-         @ nl, 0 SAY "Qty      MATERIALS                         Price       Date     Hours"
-         nl++
-         npl := nl
-         nline = 1
-         FOR nline = 1 TO ( 60-npl )           // Was 63
-         @ nl, 0 SAY "______:___________________________________:__________:_________:___________"
-           nl+=2
-           IF nl >60
-             EXIT
-           ENDIF
-           npl++ 
-         NEXT
-      ENDIF 
-***********************
-      IF mwhere = "P"
-         @ nl, 0 SAY " "
-         EndPrint()
-        ELSE
-         IF nl > 5
-            WAIT
-         ENDIF
-         mok := "N"
-         DO WHILE mok = "N"
-            mok := ApReadN()
-         ENDDO
-      ENDIF
-RETURN NIL
+        ENDIF
+        @ nl, 0 SAY "Qty      MATERIALS                         Price       Date     Hours"
+        nl++
+        npl := nl
+        nline = 1
+        FOR nline = 1 TO ( 60-npl )           // Was 63
+        @ nl, 0 SAY "______:___________________________________:__________:_________:___________"
+        nl+=2
+        IF nl >60
+            EXIT
+        ENDIF
+        npl++ 
+        NEXT
 
+        @ nl, 0 SAY " "
+        EndPrint()
+    ELSE
+        IF nl > 5
+            WAIT
+        ENDIF
+        mok := "N"
+        DO WHILE mok = "N"
+            mok := ApReadN()
+        ENDDO
+    ENDIF
+
+    SET EXACT OFF      
+
+    RETURN NIL
 
 ****------- End FindEqu
+
+STATIC FUNCTION EquFindNext(nequ, level)
+    local nrecno := 0
+
+    IF mlevel >= level
+        SELECT Equ
+        mmod := EquGetPartnum(level)
+        nrecno := RECNO() 
+        GOTO TOP
+        SEEK mmod
+        IF FOUND()   
+            EquShowMod(mmod, nequ, level)
+        ENDIF
+    ENDIF
+    SELECT Equ
+    GOTO nrecno
+
+    RETURN NIL
+
+STATIC FUNCTION EquGetPartnum(level)
+    IF level == 1
+        RETURN TRIM( Quot->Partnum )
+    ELSE
+        RETURN TRIM( Equ->Partnum )
+    ENDIF
+
+    RETURN NIL
+    
+STATIC FUNCTION EquShowMod(mmod, nequ, level)
+    DO WHILE Equ->Modcode = mmod .AND. Equ->( !EOF() )
+        CheckPage()
+        SELECT Part
+        SEEK Equ->Partnum
+        EquShowPart(level, Equ->PartQty * nequ)
+        EquFindNext(Equ->PartQty * nequ, level + 1)
+        SKIP ALIAS Equ
+    ENDDO
+    EquAfterShow(level)
+
+    RETURN NIL
+
+FUNCTION EquShowPart(level, nequ)
+    @ nl, 0 SAY REPLICATE(".", level)
+    @ nl, 6 SAY SUBSTR( Equ->Partnum, 1,16 );
+        +" "+STR( nequ, 8, 2 )+" "+SUBSTR( Part->Unit, 1, 6);
+        +" "+SUBSTR( Part->Desc, 1,18 );
+        +" "+Part->Codeno;
+        +" "+STR( Part->Instock,6 )+" "+Part->ABC
+    nl++
+
+    RETURN NIL
+
+STATIC FUNCTION EquAfterShow(level)
+    IF level == 2
+        nl++
+    ENDIF
+
+    RETURN NIL
 
 ****-----------------------------------------------------------------------
 
