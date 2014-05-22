@@ -111,7 +111,7 @@ DO WHILE .T.
     Lastused( nl )                                 // _Init.PRG
    @ 22,43-(LEN(Note->Note)/2) SAY Note->Note      // COLOR "RG+"
    mtitle2 := "Daemon Solutions  Ph  027 238 6458"
-   @ 24, 3 SAY "** CP1-25022014 "
+   @ 24, 3 SAY "** CP1-23052014 "
    @ 24,43-(LEN(mtitle2)/2) SAY mtitle2 COLOR "GB+"
    MENU TO nselect
    DO CASE
