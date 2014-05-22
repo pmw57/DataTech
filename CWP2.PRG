@@ -732,7 +732,7 @@ FUNCTION PartDets( mpartnum )
             GOTO TOP
             SEEK TRIM( Part->Partnum )
             csyscode := SPACE( 7 )
-            IF FOUND()
+            IF FOUND() .AND. LEN(TRIM( Part->Partnum )) == Len(TRIM( EquDesc->Modcode ))
                ***        tempscrn := SAVESCREEN( 0, 0, 24,80 )
                mmod1 := mmodcode
                EquCost( mmod1 )                      // CWPPart
@@ -746,7 +746,7 @@ FUNCTION PartDets( mpartnum )
             SELECT EquDesc
             GOTO TOP
             SEEK mmodcode
-            IF FOUND()
+            IF FOUND() .AND. LEN(TRIM( mmodcode )) == Len(TRIM( EquDesc->Modcode ))
                mmodcode := EquDesc->Modcode
                ntotal:= nwholesale := 0
                EquSearch( @mmodcode )               // XLF_Equ3 
