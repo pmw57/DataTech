@@ -894,8 +894,8 @@ STATIC FUNCTION AnalShowMod(mmod, nequqty, level)
     DO WHILE Equ->Modcode = mmod .AND. Equ->( !EOF() )
         CheckPage()
         SELECT Part
-        AnalShowDetails(level, Equ->PartQty * nequqty)
         SEEK Equ->Partnum
+        AnalShowDetails(level, Equ->PartQty * nequqty)
         AnalFindNext(Equ->PartQty * nequqty, level + 1)
         SKIP ALIAS Equ
     ENDDO
