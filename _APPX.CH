@@ -32,4 +32,4 @@
    IF( EMPTY( uData ), "", TRANS( uData, cPict ) )
 
 
-********----------------  END OF FILE _APPX.CH
+********----------------  END OF FILE _APPX.CH

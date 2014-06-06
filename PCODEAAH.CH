@@ -33,4 +33,3 @@
 #define P_POST2  "BARRINGTON"
 
 ** End of file - PCODEAAH.CH
-
