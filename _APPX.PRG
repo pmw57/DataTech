@@ -1,6 +1,6 @@
-*** JK  11-09-11 06:00:01 , 
+// ** JK  11-09-11 06:00:01 ,
 
-*** PAWILK10 04-10-2013 Add PathError function to display a suitable error message
+// ** PAWILK10 04-10-2013 Add PathError function to display a suitable error message
 /* Program ......:                   _APPX.PRG
 
    Authors.......: Thomas Leylan, John Kirby
@@ -28,885 +28,893 @@
 
 REQUEST HB_GT_WIN_DEFAULT
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 FUNCTION initAppx( cArgs )
 
-   /* set dos error code */
-   ERRORLEVEL( 1 )
+    /* set dos error code */
+    ErrorLevel( 1 )
 
-   InitColorSystem(cArgs)
-   InitSettings()
-   InitDebugging()
+    InitColorSystem( cArgs )
+    InitSettings()
+    InitDebugging()
 
-   /* turn off default "help" */
-   SETKEY( K_F1, NIL )
+    /* turn off default "help" */
+    SetKey( K_F1, NIL )
 
-   /* release the only PUBLIC variable */
-   ***   RELEASE getlist
+    /* release the only PUBLIC variable */
+    // **   RELEASE getlist
 
-   ***   SCROLL()
+    // **   SCROLL()
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION InitColorSystem( cArgs )
 
-   LOCAL nSet, nAt
+    LOCAL nSet, nAt
 
-   cArgs := IF( cArgs == NIL, "", UPPER( cArgs ) )
+    cArgs := IF( cArgs == NIL, "", Upper( cArgs ) )
 
-   IF ( ( nAt := AT( "-C", cArgs ) ) > 0 )
-      nSet := VAL( SUBS( cArgs, nAt + 2 ))
-   ELSE
-      IF ( ( nSet := VAL( GETENV( "AOM_COLOR" )) ) == 0 )
-         nSet := IF( ISCOLOR(), 3, 1 )
-      ENDIF
-   ENDIF
+    IF ( ( nAt := At( "-C", cArgs ) ) > 0 )
+        nSet := Val( SUBS( cArgs, nAt + 2 ) )
+    ELSE
+        IF ( ( nSet := Val( GetEnv( "AOM_COLOR" ) ) ) == 0 )
+            nSet := IF( IsColor(), 3, 1 )
+        ENDIF
+    ENDIF
 
-   ApColor( NIL, GetColors( nSet ) )
+    ApColor( NIL, GetColors( nSet ) )
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION InitSettings( cArgs )
 
-   LOCAL xExact, xScore, xCursor, xBlink, xDeleted
+    LOCAL xExact, xScore, xCursor, xBlink, xDeleted
 
-   /* initialize */
+    /* initialize */
 
-   ***   xExact := SET( _SET_EXACT, _ON )
-   ***   xScore := SET( _SET_SCOREBOARD, _OFF )
-   xCursor := SETCURSOR( SC_NORMAL )
+    // **   xExact := SET( _SET_EXACT, _ON )
+    // **   xScore := SET( _SET_SCOREBOARD, _OFF )
+    xCursor := SetCursor( SC_NORMAL )
 
-   ***   xCursor := SETCURSOR( SC_SPECIAL1 )
-   SETCURSOR( xCursor )
+    // **   xCursor := SETCURSOR( SC_SPECIAL1 )
+    SetCursor( xCursor )
 
-   xBlink := SETBLINK( _OFF )
+    xBlink := SetBlink( _OFF )
 
-   xDeleted := SET( _SET_DELETED, _ON )
+    xDeleted := Set( _SET_DELETED, _ON )
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION InitDebugging( cArgs )
 
-   LOCAL xCancel
+    LOCAL xCancel
 
-   /* turn on Alt-C (cancel) if DEBUG set */
-   xCancel := SETCANCEL( !(EMPTY( GETENV( "AOM_DEBUG" ) )) )
+    /* turn on Alt-C (cancel) if DEBUG set */
+    xCancel := SetCancel( !( Empty( GetEnv( "AOM_DEBUG" ) ) ) )
 
-   /* turn on Alt-D (debugger) if DEBUG set */
-   ALTD( IF( EMPTY( GETENV( "AOM_DEBUG" )), 0, 1 ))
+    /* turn on Alt-D (debugger) if DEBUG set */
+    AltD( IF( Empty( GetEnv( "AOM_DEBUG" ) ), 0, 1 ) )
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 FUNCTION ApAbout()
 
-   LOCAL aBox := { 8, 17, 9, 45,;
-   B_SINGLE + " ", ApColor( CS_DBOX ), " Welcome ", 1, "" }
+    LOCAL aBox := { 8, 17, 9, 45, ;
+        B_SINGLE + " ", ApColor( CS_DBOX ), " Welcome ", 1, "" }
 
-   BoxShow( aBox )
+    BoxShow( aBox )
 
-   BoxSay( aBox, 2, NIL, "Chozen DataTech Valid for 3 Month" )
-   BoxSay( aBox, 4, NIL, "      Test Version Zone/Locate   " )
-   BoxSay( aBox, 6, NIL, "      Copyright (c) 21/02 2010   " )
+    BoxSay( aBox, 2, NIL, "Chozen DataTech Valid for 3 Month" )
+    BoxSay( aBox, 4, NIL, "      Test Version Zone/Locate   " )
+    BoxSay( aBox, 6, NIL, "      Copyright (c) 21/02 2010   " )
 
-   INKEY( 2 )
+    Inkey( 2 )
 
-   BoxHide( aBox )
+    BoxHide( aBox )
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 FUNCTION ApFLock( nSec )
-   LOCAL lRet := .F.
-   nSec := 5    //Control->Sec
 
-   BEGIN SEQUENCE
-      IF NETERR()
-         ? "ERROR : Cannot Add Record to File"
-         INKEY(30)
-         BREAK
-      ENDIF   // NETERR
-   END SEQUENCE
+    LOCAL lRet := .F.
 
-   WHILE ( ( nSec == 0 ) .OR. ( nSec > 0 ) )
+    nSec := 5    // Control->Sec
 
-      DO WHILE !FLOCK()
-         Alert( "Someone Using this File  ASK WHO", { "Try Again"} )
-         IF LASTKEY() = 27
-            RETURN NIL
-         ENDIF
-        INKEY()
-      ENDDO
+    BEGIN SEQUENCE
+        IF NetErr()
+            ? "ERROR : Cannot Add Record to File"
+            Inkey( 30 )
+            BREAK
+        ENDIF   // NETERR
+    END SEQUENCE
 
-      IF ( lRet := !( NETERR() ) )
-         nSec := -1
+    WHILE ( ( nSec == 0 ) .OR. ( nSec > 0 ) )
 
-      ELSE
-         PAUSE( .5 )
-         nSec -= .5
+        DO WHILE !FLock()
+            Alert( "Someone Using this File  ASK WHO", { "Try Again" } )
+            IF LastKey() = 27
+                RETURN NIL
+            ENDIF
+            Inkey()
+        ENDDO
 
-      ENDIF
+        IF ( lRet := !( NetErr() ) )
+            nSec := -1
 
-   ENDDO
+        ELSE
+            PAUSE( .5 )
+            nSec -= .5
 
-   RETURN lRet // lock status
+        ENDIF
 
-   **-------------------------------------------------------------------
+    ENDDO
+
+    RETURN lRet // lock status
+
+// *-------------------------------------------------------------------
 
 FUNCTION ApRLock( nSec )
 
-   LOCAL lRet := .F.
-   nSec := 5    // Control->Sec
+    LOCAL lRet := .F.
 
-   BEGIN SEQUENCE
-      IF NETERR()
-         ? "ERROR : Cannot Add Record to File"
-         INKEY(30)
-         BREAK
-      ENDIF   // NETERR
-   END SEQUENCE
+    nSec := 5    // Control->Sec
 
-   WHILE ( nSec >= 0 )
-      LockRecord()
-      IF lRet := !( NETERR() )
-         EXIT
-      ELSE
-         PAUSE( .5 )
-         nSec -= .5
-      ENDIF
-   ENDDO
+    BEGIN SEQUENCE
+        IF NetErr()
+            ? "ERROR : Cannot Add Record to File"
+            Inkey( 30 )
+            BREAK
+        ENDIF   // NETERR
+    END SEQUENCE
 
-   RETURN lRet        // lock status
+    WHILE ( nSec >= 0 )
+        LockRecord()
+        IF lRet := !( NetErr() )
+            EXIT
+        ELSE
+            PAUSE( .5 )
+            nSec -= .5
+        ENDIF
+    ENDDO
 
-   **---------------------------------------------------------------------*
+    RETURN lRet        // lock status
+
+// *---------------------------------------------------------------------*
 
 STATIC FUNCTION LockRecord()
 
-   DO WHILE !RLOCK()
-      Alert( "Someone Using Record  ASK WHO", { "Try Again"} )
-      IF PressedEsc()
-         RETURN NIL
-      ENDIF
-      INKEY()
-   ENDDO
+    DO WHILE !RLock()
+        Alert( "Someone Using Record  ASK WHO", { "Try Again" } )
+        IF PressedEsc()
+            RETURN NIL
+        ENDIF
+        Inkey()
+    ENDDO
 
-   RETURN NIL
+    RETURN NIL
 
-   **---------------------------------------------------------------------*
+// *---------------------------------------------------------------------*
 
 FUNCTION ApReadN()
 
-   LOCAL aBox := { 20, 17, 4, 46,;
-      B_SINGLE + " ", ApColor( CS_DBOX ), "  "+" Confirm Read " , 1, "" }
+    LOCAL aBox := { 20, 17, 4, 46, ;
+        B_SINGLE + " ", ApColor( CS_DBOX ), "  " + " Confirm Read ", 1, "" }
 
-   LOCAL aBtn := { {{ 21, 26, "  YES   ", 3, "" },;
-                    { 21, 42, "   NO   ", 4, "" }},;
-                    BN_CHARS,;
-                    "YN",;
-                    ApColor( CS_BUNS ),;
-                    ApColor( CS_BKEY ),;
-                    BN_DIM, 2, K_LEFT, K_RIGHT }
+    LOCAL aBtn := { { { 21, 26, "  YES   ", 3, "" },;
+        { 21, 42, "   NO   ", 4, "" } }, ;
+        BN_CHARS, ;
+        "YN", ;
+        ApColor( CS_BUNS ), ;
+        ApColor( CS_BKEY ), ;
+        BN_DIM, 2, K_LEFT, K_RIGHT }
 
-   SETCURSOR( SC_NONE )
-   SCROLL( 20,17, 24,46 )
-   
-   ChooseButton( aBox, aBtn )
-   
-   SETCURSOR(SC_NORMAL )
+    SetCursor( SC_NONE )
+    Scroll( 20, 17, 24, 46 )
 
-   IF aBtn[ BN_POSI ] == 1
-      RETURN "Y"
-   ENDIF
-   
-   RETURN "N"
+    ChooseButton( aBox, aBtn )
 
-   **-------------------------------------------------------------------
+    SetCursor( SC_NORMAL )
+
+    IF aBtn[ BN_POSI ] == 1
+        RETURN "Y"
+    ENDIF
+
+    RETURN "N"
+
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION ChooseButton( aBox, aBtn, aSay_ )
-   
-   LOCAL nLeft, nTop, cString
-   
-   BoxShow( aBox )
-   BtnShow( aBtn )
 
-   IF aSay_ != NIL
-      nLeft := aSay_[1]
-      nTop := aSay_[2]
-      cString := aSay_[3]
-      BoxSay( aBox, nLeft, nTop, cString )
-   ENDIF
-      
-   BtnGet( aBtn )
+    LOCAL nLeft, nTop, cString
 
-   BtnHide( aBtn )
-   BoxHide( aBox )
+    BoxShow( aBox )
+    BtnShow( aBtn )
 
-   RETURN NIL
+    IF aSay_ != NIL
+        nLeft := aSay_[ 1 ]
+        nTop := aSay_[ 2 ]
+        cString := aSay_[ 3 ]
+        BoxSay( aBox, nLeft, nTop, cString )
+    ENDIF
 
-   **-------------------------------------------------------------------
+    BtnGet( aBtn )
+
+    BtnHide( aBtn )
+    BoxHide( aBox )
+
+    RETURN NIL
+
+// *-------------------------------------------------------------------
 
 FUNCTION ApQuit( cstring )
 
-   LOCAL aBox := { 8, 17, 9, 46,;
-      B_SINGLE + " ", ApColor( CS_DBOX ),TRIM( Control->O_Head ), 1, "" }
-   LOCAL aBtn := { { { 10, 48, "  Cont   ", 3, "" },;
-                     { 13, 48, "  Exit   ", 3, "" }},;
-                     BN_CHARS,;
-                     "CE",;
-                     ApColor( CS_BUNS ),;
-                     ApColor( CS_BKEY ),;
-                     BN_DIM, 1, K_UP, K_DOWN }
-   
-   SETCURSOR( SC_NONE )
+    LOCAL aBox := { 8, 17, 9, 46, ;
+        B_SINGLE + " ", ApColor( CS_DBOX ), Trim( Control->O_Head ), 1, "" }
+    LOCAL aBtn := { { { 10, 48, "  Cont   ", 3, "" },;
+        { 13, 48, "  Exit   ", 3, "" } }, ;
+        BN_CHARS, ;
+        "CE", ;
+        ApColor( CS_BUNS ), ;
+        ApColor( CS_BKEY ), ;
+        BN_DIM, 1, K_UP, K_DOWN }
 
-   ChooseButton( aBox, aBtn, { 3, 4, cstring } )
+    SetCursor( SC_NONE )
 
-   SETCURSOR(SC_NORMAL )
+    ChooseButton( aBox, aBtn, { 3, 4, cstring } )
 
-   IF ( aBtn[ BN_POSI ] == 2 )
-      return "Y"
-   ENDIF
+    SetCursor( SC_NORMAL )
 
-   RETURN "N"
+    IF ( aBtn[ BN_POSI ] == 2 )
+        RETURN "Y"
+    ENDIF
 
-   **-------------------------------------------------------------------
+    RETURN "N"
+
+// *-------------------------------------------------------------------
 
 FUNCTION ApCheck( cstring )
 
-   LOCAL aBox := { 20, 17, 4, 46,;
-      B_SINGLE + " ", ApColor( CS_DBOX ), "  "+cstring , 1, "" }
+    LOCAL aBox := { 20, 17, 4, 46, ;
+        B_SINGLE + " ", ApColor( CS_DBOX ), "  " + cstring, 1, "" }
 
-   LOCAL aBtn := { {{ 21, 26, "  Delete  ", 3, "" },;
-                    { 21, 42, "    NO    ", 5, "" }},;
-                    BN_CHARS,;
-                    "DN",;
-                    ApColor( CS_BUNS ),;
-                    ApColor( CS_BKEY ),;
-                    BN_DIM, 2, K_LEFT, K_RIGHT }
+    LOCAL aBtn := { { { 21, 26, "  Delete  ", 3, "" },;
+        { 21, 42, "    NO    ", 5, "" } }, ;
+        BN_CHARS, ;
+        "DN", ;
+        ApColor( CS_BUNS ), ;
+        ApColor( CS_BKEY ), ;
+        BN_DIM, 2, K_LEFT, K_RIGHT }
 
-   SETCURSOR( SC_NONE )
+    SetCursor( SC_NONE )
 
-   ChooseButton( aBox, aBtn, { 3, 4, cstring } )
+    ChooseButton( aBox, aBtn, { 3, 4, cstring } )
 
-   SETCURSOR(SC_NORMAL )
+    SetCursor( SC_NORMAL )
 
-   IF ( aBtn[ BN_POSI ] == 1 )
-      RETURN "Y"
-   ENDIF
+    IF ( aBtn[ BN_POSI ] == 1 )
+        RETURN "Y"
+    ENDIF
 
-   RETURN "N"
+    RETURN "N"
 
-   **---------------------------------------------------------------------*
+// *---------------------------------------------------------------------*
 
 FUNCTION ApGetN( cstring )
 
-   LOCAL aBox := { 20, 17, 4, 46,;
-      B_SINGLE + " ", ApColor( CS_DBOX ), "  "+cstring , 1, "" }
+    LOCAL aBox := { 20, 17, 4, 46, ;
+        B_SINGLE + " ", ApColor( CS_DBOX ), "  " + cstring, 1, "" }
 
-   LOCAL aBtn := { { { 21, 26, "  YES   ", 3, "" },;
-                     { 21, 42, "   NO   ", 4, "" }},;
-                     BN_CHARS,;
-                     "YN",;
-                     ApColor( CS_BUNS ),;
-                     ApColor( CS_BKEY ),;
-                     BN_DIM, 2, K_LEFT, K_RIGHT }
+    LOCAL aBtn := { { { 21, 26, "  YES   ", 3, "" },;
+        { 21, 42, "   NO   ", 4, "" } }, ;
+        BN_CHARS, ;
+        "YN", ;
+        ApColor( CS_BUNS ), ;
+        ApColor( CS_BKEY ), ;
+        BN_DIM, 2, K_LEFT, K_RIGHT }
 
-   SETCURSOR( SC_NONE )
-   SCROLL( 20,17, 24,46 )
-   
-   ChooseButton( aBox, aBtn )
+    SetCursor( SC_NONE )
+    Scroll( 20, 17, 24, 46 )
 
-   SETCURSOR(SC_NORMAL )
+    ChooseButton( aBox, aBtn )
 
-   IF ( aBtn[ BN_POSI ] == 1 )
-      RETURN "Y"
-   ENDIF
-   
-   RETURN "N"
+    SetCursor( SC_NORMAL )
 
-   **-------------------------------------------------------------------
+    IF ( aBtn[ BN_POSI ] == 1 )
+        RETURN "Y"
+    ENDIF
+
+    RETURN "N"
+
+// *-------------------------------------------------------------------
 
 FUNCTION ApGetY( cstring )
 
-   LOCAL aBox := { 20, 17, 4, 46,;
-      B_SINGLE + " ", ApColor( CS_DBOX ),"  "+cstring, 1, "" }
+    LOCAL aBox := { 20, 17, 4, 46, ;
+        B_SINGLE + " ", ApColor( CS_DBOX ), "  " + cstring, 1, "" }
 
-   LOCAL aBtn := { { { 21, 26, "  YES   ", 3, "" },;
-                     { 21, 42, "   NO   ", 4, "" }},;
-                     BN_CHARS,;
-                     "YN",;
-                     ApColor( CS_BUNS ),;
-                     ApColor( CS_BKEY ),;
-                     BN_DIM, 1, K_LEFT, K_RIGHT }
+    LOCAL aBtn := { { { 21, 26, "  YES   ", 3, "" },;
+        { 21, 42, "   NO   ", 4, "" } }, ;
+        BN_CHARS, ;
+        "YN", ;
+        ApColor( CS_BUNS ), ;
+        ApColor( CS_BKEY ), ;
+        BN_DIM, 1, K_LEFT, K_RIGHT }
 
-   SETCURSOR( SC_NONE )
-   SCROLL( 20,17, 24,46 )
+    SetCursor( SC_NONE )
+    Scroll( 20, 17, 24, 46 )
 
-   ChooseButton( aBox, aBtn )
+    ChooseButton( aBox, aBtn )
 
-   SETCURSOR(SC_NORMAL )
+    SetCursor( SC_NORMAL )
 
-   IF aBtn[ BN_POSI ] == 1
-      RETURN "Y"
-   ENDIF
-   
-   RETURN "N"
+    IF aBtn[ BN_POSI ] == 1
+        RETURN "Y"
+    ENDIF
 
-   **-------------------------------------------------------------------
+    RETURN "N"
+
+// *-------------------------------------------------------------------
 
 FUNCTION ApBye()
 
-   LOCAL xCursor := SETCURSOR( SC_NONE )
+    LOCAL xCursor := SetCursor( SC_NONE )
 
-   /* credits */
-   @  6, 0 SAY "Thank You for Using       "+Control->O_Head
-   @ 10, 0 SAY Control->O_Name
-   @ 11, 0 SAY Control->O_Add1
-   @ 12, 0 SAY Control->O_Add2
-   @ 13, 0 SAY Control->O_Add3
-   @ 14, 0 SAY Control->O_Add4
-   @ 16, 0 SAY "Phone "+Control->O_Phone
-   @ 17, 0 SAY "Fax   "+Control->O_Fax
-   @ 23, 0
+    /* credits */
+    @  6, 0 SAY "Thank You for Using       " + Control->O_Head
+    @ 10, 0 SAY Control->O_Name
+    @ 11, 0 SAY Control->O_Add1
+    @ 12, 0 SAY Control->O_Add2
+    @ 13, 0 SAY Control->O_Add3
+    @ 14, 0 SAY Control->O_Add4
+    @ 16, 0 SAY "Phone " + Control->O_Phone
+    @ 17, 0 SAY "Fax   " + Control->O_Fax
+    @ 23, 0
 
-   SETCURSOR( xCursor )
+    SetCursor( xCursor )
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 FUNCTION Wipe( nDelay )
 
-   LOCAL nCnt, nMax
+    LOCAL nCnt, nMax
 
-   FOR nCnt := 0 TO 24
+    FOR nCnt := 0 TO 24
 
-      SCROLL( 0, 0, 24, 79, -1, 4 )
+        Scroll( 0, 0, 24, 79, -1, 4 )
 
       /* nMax, the calculated ending time in seconds must be
          MOD 86399 (the number of seconds elapsed at midnight)
          or an endless loop will result if you're unlucky
          enough to run this near midnight */
 
-      nMax := (( SECONDS() + nDelay ) % 86399 )
-      WHILE ( SECONDS() <= nMax ); ENDDO
-   NEXT
+        nMax := ( ( Seconds() + nDelay ) % 86399 )
+        WHILE ( Seconds() <= nMax ); ENDDO
+    NEXT
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION ApError( cMsg )
 
-   LOCAL aBox := { 8, 17, 9, 46,;
-      B_SINGLE + " ", ApColor( CS_DBOX ), " Error ", 1, "" }
+    LOCAL aBox := { 8, 17, 9, 46, ;
+        B_SINGLE + " ", ApColor( CS_DBOX ), " Error ", 1, "" }
 
-   LOCAL aBtn := { {{ 14, 34, "    Ok    ", 5, "" }},;
-                    BN_CHARS,;
-                    "O",;
-                    ApColor( CS_BUNS ),;
-                    ApColor( CS_BKEY ),;
-                    BN_DIM, 1, NIL, NIL }
+    LOCAL aBtn := { { { 14, 34, "    Ok    ", 5, "" } }, ;
+        BN_CHARS, ;
+        "O", ;
+        ApColor( CS_BUNS ), ;
+        ApColor( CS_BKEY ), ;
+        BN_DIM, 1, NIL, NIL }
 
-   ChooseButton( aBox, aBtn, { 2, NIL, cMsg } )
+    ChooseButton( aBox, aBtn, { 2, NIL, cMsg } )
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 FUNCTION PathError()
 
-   LOCAL aBox := { 10, 17, 7, 45,;
-   B_SINGLE + " ", ApColor( CS_DBOX ), " DOS Error 3: Path Not Found ", 1, "" }
+    LOCAL aBox := { 10, 17, 7, 45, ;
+        B_SINGLE + " ", ApColor( CS_DBOX ), " DOS Error 3: Path Not Found ", 1, "" }
 
-   BoxShow( aBox )
+    BoxShow( aBox )
 
-   BoxSay( aBox, 1, NIL, "The path can not be found." )
-   BoxSay( aBox, 3, NIL, "Please verify that the path exists," )
-   BoxSay( aBox, 4, NIL, "and press any key to try again ..." )
+    BoxSay( aBox, 1, NIL, "The path can not be found." )
+    BoxSay( aBox, 3, NIL, "Please verify that the path exists," )
+    BoxSay( aBox, 4, NIL, "and press any key to try again ..." )
 
-   INKEY( 0 )
+    Inkey( 0 )
 
-   BoxHide( aBox )
+    BoxHide( aBox )
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION Shadow( nTop, nLeft, nBottom, nRight )
 
-         SCROLL( nTop+1, nRight+1, nBottom, nRight+1, 0, 0 )
-         SCROLL( nBottom+1, nLeft+1, nBottom+1, nRight+1, 0, 0 )
+    Scroll( nTop + 1, nRight + 1, nBottom, nRight + 1, 0, 0 )
+    Scroll( nBottom + 1, nLeft + 1, nBottom + 1, nRight + 1, 0, 0 )
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BoxShow( aSelf )
 
-   LOCAL nTop    := aSelf[ BX_TOP ], nLeft   := aSelf[ BX_LEFT ]
-   LOCAL nLength := aSelf[ BX_HEIGHT ], nWidth  := aSelf[ BX_WIDTH ]
-   LOCAL nBottom := ( nTop + nLength ), nRight  := ( nLeft + nWidth )
+    LOCAL nTop    := aSelf[ BX_TOP ], nLeft   := aSelf[ BX_LEFT ]
+    LOCAL nLength := aSelf[ BX_HEIGHT ], nWidth  := aSelf[ BX_WIDTH ]
+    LOCAL nBottom := ( nTop + nLength ), nRight  := ( nLeft + nWidth )
 
-   LOCAL nShadow := IF( aSelf[ BX_SHADOW ] == 0, 0, 1 )
-   LOCAL nCenter := nLeft + (( nWidth - LEN( aSelf[ BX_TITLE ] )) / 2 )
+    LOCAL nShadow := IF( aSelf[ BX_SHADOW ] == 0, 0, 1 )
+    LOCAL nCenter := nLeft + ( ( nWidth - Len( aSelf[ BX_TITLE ] ) ) / 2 )
 
-   LOCAL cColorN := BoxColorN( aSelf[ BX_COLOR ] )
-   LOCAL cColorW := BoxColorW( aSelf[ BX_COLOR ] )
-   
-   // save the background
-   aSelf[ BX_IMAGE ] := SAVESCREEN( nTop, nLeft, nBottom + nShadow, nRight + nShadow )
+    LOCAL cColorN := BoxColorN( aSelf[ BX_COLOR ] )
+    LOCAL cColorW := BoxColorW( aSelf[ BX_COLOR ] )
 
-   DISPBEGIN()
+    // save the background
+    aSelf[ BX_IMAGE ] := SaveScreen( nTop, nLeft, nBottom + nShadow, nRight + nShadow )
 
-   DISPBOX( nTop, nLeft, nBottom, nRight, aSelf[ BX_FRAME ], cColorN )
-   Disp3DEffect( nTop, nBottom, nLeft, nRight, cColorW, aSelf[ BX_FRAME ] )
-   DispTitle( aSelf[ BX_TITLE ], nTop, nCenter, aSelf[ BX_COLOR ] )
+    DispBegin()
 
-   DISPEND()
+    DispBox( nTop, nLeft, nBottom, nRight, aSelf[ BX_FRAME ], cColorN )
+    Disp3DEffect( nTop, nBottom, nLeft, nRight, cColorW, aSelf[ BX_FRAME ] )
+    DispTitle( aSelf[ BX_TITLE ], nTop, nCenter, aSelf[ BX_COLOR ] )
 
-   DispShadow( nTop, nLeft, nBottom, nRight, nShadow )
+    DispEnd()
 
-   RETURN NIL
+    DispShadow( nTop, nLeft, nBottom, nRight, nShadow )
 
-   **-------------------------------------------------------------------
+    RETURN NIL
+
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BoxColorN( cBoxColor )
 
-   LOCAL cSub := SUBS( cBoxColor, AT( "/", cBoxColor ) )
-   LOCAL cBak := SUBS( cSub, 2, AT( ",", cSub ) )
-   LOCAL cColorN := IF( "N" $ cBak, "W", "N" ) + cSub
+    LOCAL cSub := SUBS( cBoxColor, At( "/", cBoxColor ) )
+    LOCAL cBak := SUBS( cSub, 2, At( ",", cSub ) )
+    LOCAL cColorN := IF( "N" $ cBak, "W", "N" ) + cSub
 
-   RETURN cColorN
+    RETURN cColorN
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BoxColorW( cBoxColor )
 
-   LOCAL cSub := SUBS( cBoxColor, AT( "/", cBoxColor ) )
-   LOCAL cBak := SUBS( cSub, 2, AT( ",", cSub ) )
-   LOCAL cColorW := "+W" + cSub
+    LOCAL cSub := SUBS( cBoxColor, At( "/", cBoxColor ) )
+    LOCAL cBak := SUBS( cSub, 2, At( ",", cSub ) )
+    LOCAL cColorW := "+W" + cSub
 
-   RETURN cColorW
+    RETURN cColorW
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION Disp3DEffect( nTop, nBottom, nLeft, nRight, cColorW, frame )
 
-   LOCAL nCnt
-   LOCAL xDelta := nRight - nLeft - 1
+    LOCAL nCnt
+    LOCAL xDelta := nRight - nLeft - 1
 
-   @ nTop, nRight SAY SUBS( frame, 3, 1 ) COLOR cColorW
+    @ nTop, nRight SAY SUBS( frame, 3, 1 ) COLOR cColorW
 
-   FOR nCnt := nTop + 1 TO nBottom - 1
-      @ nCnt, nRight SAY SUBS( frame, 4, 1 ) COLOR cColorW
-   NEXT
+    FOR nCnt := nTop + 1 TO nBottom - 1
+        @ nCnt, nRight SAY SUBS( frame, 4, 1 ) COLOR cColorW
+    NEXT
 
-   @ nBottom, nRight SAY SUBS( frame, 5, 1 ) COLOR cColorW
+    @ nBottom, nRight SAY SUBS( frame, 5, 1 ) COLOR cColorW
 
-   @ nBottom, nLeft + 1 SAY REPL( SUBS( frame, 6, 1 ),;
-      nRight - nLeft - 1 ) COLOR cColorW
+    @ nBottom, nLeft + 1 SAY REPL( SUBS( frame, 6, 1 ), ;
+        nRight - nLeft - 1 ) COLOR cColorW
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION DispTitle( cTitle, nTop, nCenter, cColor )
 
-   IF !EMPTY( cTitle )
-      @ nTop, nCenter SAY cTitle COLOR cColor
-   ENDIF
+    IF !Empty( cTitle )
+        @ nTop, nCenter SAY cTitle COLOR cColor
+    ENDIF
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION DispShadow( nTop, nLeft, nBottom, nRight, nShadow )
-   
-   IF ( nShadow == 0 )
-      Shadow( nTop, nLeft, nBottom, nRight )
-   ENDIF
 
-   RETURN NIL
+    IF ( nShadow == 0 )
+        Shadow( nTop, nLeft, nBottom, nRight )
+    ENDIF
 
-   **-------------------------------------------------------------------
+    RETURN NIL
+
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BoxHide( aSelf )
 
-   LOCAL nTop    := aSelf[ BX_TOP ]
-   LOCAL nLeft   := aSelf[ BX_LEFT ]
+    LOCAL nTop    := aSelf[ BX_TOP ]
+    LOCAL nLeft   := aSelf[ BX_LEFT ]
 
-   LOCAL nLength := aSelf[ BX_HEIGHT ]
-   LOCAL nWidth  := aSelf[ BX_WIDTH ]
+    LOCAL nLength := aSelf[ BX_HEIGHT ]
+    LOCAL nWidth  := aSelf[ BX_WIDTH ]
 
-   LOCAL nBottom := ( nTop + nLength )
-   LOCAL nRight  := ( nLeft + nWidth )
+    LOCAL nBottom := ( nTop + nLength )
+    LOCAL nRight  := ( nLeft + nWidth )
 
-   LOCAL nShadow := IF( aSelf[ BX_SHADOW ] == 0, 0, 1 )
+    LOCAL nShadow := IF( aSelf[ BX_SHADOW ] == 0, 0, 1 )
 
-   /* restore the background */
-   RESTSCREEN( nTop, nLeft, nBottom + nShadow, nRight + nShadow, ;
-      aSelf[ BX_IMAGE ] )
+    /* restore the background */
+    RestScreen( nTop, nLeft, nBottom + nShadow, nRight + nShadow, ;
+        aSelf[ BX_IMAGE ] )
 
-   /* reclaim the memory */
-   aSelf[ BX_IMAGE ] := ""
+    /* reclaim the memory */
+    aSelf[ BX_IMAGE ] := ""
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BoxSay( aSelf, nRow, nCol, cStr )
 
-   LOCAL nTop    := aSelf[ BX_TOP ]
-   LOCAL nLeft   := aSelf[ BX_LEFT ]
+    LOCAL nTop    := aSelf[ BX_TOP ]
+    LOCAL nLeft   := aSelf[ BX_LEFT ]
 
-   LOCAL nHeight := aSelf[ BX_HEIGHT ]
-   LOCAL nWidth  := aSelf[ BX_WIDTH ]
+    LOCAL nHeight := aSelf[ BX_HEIGHT ]
+    LOCAL nWidth  := aSelf[ BX_WIDTH ]
 
-   LOCAL nBottom := ( nTop + nHeight )
-   LOCAL nRight  := ( nLeft + nWidth )
+    LOCAL nBottom := ( nTop + nHeight )
+    LOCAL nRight  := ( nLeft + nWidth )
 
-   nRow += ( nTop + 1 )
+    nRow += ( nTop + 1 )
 
-   /* if message within box (vertically) */
-   IF ( nRow > nTop ) .AND. ( nRow < nBottom )
+    /* if message within box (vertically) */
+    IF ( nRow > nTop ) .AND. ( nRow < nBottom )
 
-      /* center message if column not supplied */
-      IF ( nCol == NIL )
-         nCol := (( nWidth - 1 - LEN( cStr ) ) / 2 )
-      ENDIF
+        /* center message if column not supplied */
+        IF ( nCol == NIL )
+            nCol := ( ( nWidth - 1 - Len( cStr ) ) / 2 )
+        ENDIF
 
-      nCol += ( nLeft + 1 )
-      BoxSayInColumn( nrow, nCol, nLeft, nRight, cStr, aSelf[ BX_COLOR ] )
+        nCol += ( nLeft + 1 )
+        BoxSayInColumn( nrow, nCol, nLeft, nRight, cStr, aSelf[ BX_COLOR ] )
 
-   ENDIF
+    ENDIF
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BoxSayInColumn( nrow, nCol, nLeft, nRight, cStr, cColor )
 
-   LOCAL nBeg, nEnd, nS1, nS2
+    LOCAL nBeg, nEnd, nS1, nS2
 
-   /* calculate beginning and ending columns */
-   nBeg := MAX( nCol, nLeft + 1 )
-   nEnd := MIN( nCol + LEN( cStr ), nRight )
+    /* calculate beginning and ending columns */
+    nBeg := Max( nCol, nLeft + 1 )
+    nEnd := Min( nCol + Len( cStr ), nRight )
 
-   /* if message begins within box (horizontally) */
-   IF ( nBeg < nEnd )
+    /* if message begins within box (horizontally) */
+    IF ( nBeg < nEnd )
 
-      /* truncate message if necessary */
-      nS1 := ( nBeg - nCol ) + 1
-      nS2 := MIN( nEnd - nBeg, LEN( cStr ) )
+        /* truncate message if necessary */
+        nS1 := ( nBeg - nCol ) + 1
+        nS2 := Min( nEnd - nBeg, Len( cStr ) )
 
-      DISPBEGIN()
-      @ nRow, nBeg SAY SUBS( cStr, nS1, nS2 ) COLOR cColor
-      DISPEND()
+        DispBegin()
+        @ nRow, nBeg SAY SUBS( cStr, nS1, nS2 ) COLOR cColor
+        DispEnd()
 
-   ENDIF
+    ENDIF
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BoxGet( aSelf, aGet, aDat )
-   LOCAL xCursor := SETCURSOR( SC_NORMAL )
-   ***   LOCAL xCursor := SETCURSOR( SC_SPECIAL1 )   // FULL BOX
 
-   READMODAL( aGet )
+    LOCAL xCursor := SetCursor( SC_NORMAL )
 
-   SETCURSOR( xCursor )
+    // **   LOCAL xCursor := SETCURSOR( SC_SPECIAL1 )   // FULL BOX
 
-   RETURN NIL
+    ReadModal( aGet )
 
-   **-------------------------------------------------------------------
+    SetCursor( xCursor )
+
+    RETURN NIL
+
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BtnShow( aSelf )
-   LOCAL nTop, nLeft, nBottom, nRight
 
-   LOCAL nEle
-   LOCAL nMax := LEN( aSelf[ BN_ITEMS ] )
+    LOCAL nTop, nLeft, nBottom, nRight
 
-   FOR nEle := 1 TO nMax
+    LOCAL nEle
+    LOCAL nMax := Len( aSelf[ BN_ITEMS ] )
 
-      nTop := aSelf[ BN_ITEMS, nEle, BN_ROW ]
-      nBottom := nTop + 2
+    FOR nEle := 1 TO nMax
 
-      nLeft := aSelf[ BN_ITEMS, nEle, BN_COL ]
-      nRight := nLeft + ( LEN( aSelf[ BN_ITEMS, nEle, BN_NAME ] ) + 1 )
+        nTop := aSelf[ BN_ITEMS, nEle, BN_ROW ]
+        nBottom := nTop + 2
 
-      aSelf[ BN_ITEMS, nEle, BN_IMAGE ] := ;
-         SAVESCREEN( nTop, nLeft, nBottom, nRight )
+        nLeft := aSelf[ BN_ITEMS, nEle, BN_COL ]
+        nRight := nLeft + ( Len( aSelf[ BN_ITEMS, nEle, BN_NAME ] ) + 1 )
 
-   NEXT
+        aSelf[ BN_ITEMS, nEle, BN_IMAGE ] := ;
+            SaveScreen( nTop, nLeft, nBottom, nRight )
 
-   BtnSet( aSelf, NIL )
+    NEXT
 
-   RETURN NIL
+    BtnSet( aSelf, NIL )
 
-   **-------------------------------------------------------------------
+    RETURN NIL
+
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BtnHide( aSelf )
-   LOCAL nTop, nLeft, nBottom, nRight
 
-   LOCAL nEle
-   LOCAL nMax := LEN( aSelf[ BN_ITEMS ] )
+    LOCAL nTop, nLeft, nBottom, nRight
 
-   FOR nEle := 1 TO nMax
+    LOCAL nEle
+    LOCAL nMax := Len( aSelf[ BN_ITEMS ] )
 
-      nTop := aSelf[ BN_ITEMS, nEle, BN_ROW ]
-      nBottom := nTop + 2
+    FOR nEle := 1 TO nMax
 
-      nLeft := aSelf[ BN_ITEMS, nEle, BN_COL ]
-      nRight := nLeft + ( LEN( aSelf[ BN_ITEMS, nEle, BN_NAME ] ) + 1 )
+        nTop := aSelf[ BN_ITEMS, nEle, BN_ROW ]
+        nBottom := nTop + 2
 
-      /* restore the image */
+        nLeft := aSelf[ BN_ITEMS, nEle, BN_COL ]
+        nRight := nLeft + ( Len( aSelf[ BN_ITEMS, nEle, BN_NAME ] ) + 1 )
 
-      RESTSCREEN( nTop, nLeft, nBottom, nRight,;
-         aSelf[ BN_ITEMS, nEle, BN_IMAGE ] )
+        /* restore the image */
 
-      /* reclaim the memory */
+        RestScreen( nTop, nLeft, nBottom, nRight, ;
+            aSelf[ BN_ITEMS, nEle, BN_IMAGE ] )
 
-      aSelf[ BN_ITEMS, nEle, BN_IMAGE ] := ""
+        /* reclaim the memory */
 
-   NEXT
+        aSelf[ BN_ITEMS, nEle, BN_IMAGE ] := ""
 
-   RETURN NIL
+    NEXT
 
-   **-------------------------------------------------------------------
+    RETURN NIL
+
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BtnSet( aSelf, nEle )
 
-   LOCAL nBeg := IF( nEle == NIL, 1, nEle )
-   LOCAL nMax := IF( nEle == NIL, LEN( aSelf[ BN_ITEMS ] ), nEle )
+    LOCAL nBeg := IF( nEle == NIL, 1, nEle )
+    LOCAL nMax := IF( nEle == NIL, Len( aSelf[ BN_ITEMS ] ), nEle )
 
-   DISPBEGIN()
+    DispBegin()
 
-   FOR nEle := nBeg TO nMax
-      CreateTitledButton( aSelf, nEle  )
-   NEXT
+    FOR nEle := nBeg TO nMax
+        CreateTitledButton( aSelf, nEle  )
+    NEXT
 
-   DISPEND()
+    DispEnd()
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION CreateTitledButton( aSelf, nEle )
 
-   LOCAL cName := aSelf[ BN_ITEMS, nEle, BN_NAME ]
-   LOCAL nWide := LEN( cName )
-   LOCAL nTop := aSelf[ BN_ITEMS, nEle, BN_ROW ]
-   LOCAL nBottom := nTop + 2
-   LOCAL nLeft := aSelf[ BN_ITEMS, nEle, BN_COL ]
-   LOCAL nRight := nLeft + ( nWide + 1 )
-   LOCAL cColorN := BoxColorN( aSelf[ BN_CLRN ] )
-   LOCAL cColorW := BoxColorW( aSelf[ BN_CLRN ] )
-   LOCAL isActiveButton := nEle == aSelf[ BN_POSI ]
+    LOCAL cName := aSelf[ BN_ITEMS, nEle, BN_NAME ]
+    LOCAL nWide := Len( cName )
+    LOCAL nTop := aSelf[ BN_ITEMS, nEle, BN_ROW ]
+    LOCAL nBottom := nTop + 2
+    LOCAL nLeft := aSelf[ BN_ITEMS, nEle, BN_COL ]
+    LOCAL nRight := nLeft + ( nWide + 1 )
+    LOCAL cColorN := BoxColorN( aSelf[ BN_CLRN ] )
+    LOCAL cColorW := BoxColorW( aSelf[ BN_CLRN ] )
+    LOCAL isActiveButton := nEle == aSelf[ BN_POSI ]
 
-   LOCAL cKey := SUBS( cName, aSelf[ BN_ITEMS, nEle, BN_SPOT ], 1 )
-   LOCAL nSpot := aSelf[ BN_ITEMS, nEle, BN_SPOT ] + nLeft
+    LOCAL cKey := SUBS( cName, aSelf[ BN_ITEMS, nEle, BN_SPOT ], 1 )
+    LOCAL nSpot := aSelf[ BN_ITEMS, nEle, BN_SPOT ] + nLeft
 
-   cName := LTRIM( RTRIM( cName ) )
+    cName := LTrim( RTrim( cName ) )
 
-   DO CASE
-      CASE ( aSelf[ BN_MODE ] == BN_DIM )
-         BtnCreate( nTop, nBottom, nLeft, nRight, aSelf[ BN_FRAME ], cColorN, cColorW )
-         BtnTitle( cName, nTop, nLeft, nWide, aSelf[ BN_CLRN ] )
-      CASE ( aSelf[ BN_MODE ] == BN_NORM )
-         BtnCreate( nTop, nBottom, nLeft, nRight, aSelf[ BN_FRAME ], cColorW, cColorN )
-         BtnTitle( cName, nTop, nLeft, nWide, aSelf[ BN_CLRN ], isActiveButton )
+    DO CASE
+    CASE ( aSelf[ BN_MODE ] == BN_DIM )
+        BtnCreate( nTop, nBottom, nLeft, nRight, aSelf[ BN_FRAME ], cColorN, cColorW )
+        BtnTitle( cName, nTop, nLeft, nWide, aSelf[ BN_CLRN ] )
+    CASE ( aSelf[ BN_MODE ] == BN_NORM )
+        BtnCreate( nTop, nBottom, nLeft, nRight, aSelf[ BN_FRAME ], cColorW, cColorN )
+        BtnTitle( cName, nTop, nLeft, nWide, aSelf[ BN_CLRN ], isActiveButton )
 
-         /* draw highlighted key */
-         @ nTop + 1, nSpot SAY cKey COLOR aSelf[ BN_CLRK ]
-   ENDCASE
+        /* draw highlighted key */
+        @ nTop + 1, nSpot SAY cKey COLOR aSelf[ BN_CLRK ]
+    ENDCASE
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BtnCreate( nTop, nBottom, nLeft, nRight, frame, cColorL, cColorH )
 
-   LOCAL nCnt
+    LOCAL nCnt
 
-   DISPBOX( nTop, nLeft, nBottom, nRight, frame, cColorL )
+    DispBox( nTop, nLeft, nBottom, nRight, frame, cColorL )
 
-   /* 3-D effect */
+    /* 3-D effect */
 
-   @ nTop, nRight SAY SUBS( frame, 3, 1 ) COLOR cColorH
+    @ nTop, nRight SAY SUBS( frame, 3, 1 ) COLOR cColorH
 
-   FOR nCnt := nTop + 1 TO nBottom - 1
-      @ nCnt, nRight SAY SUBS( frame, 4, 1 ) COLOR cColorH
-   NEXT
+    FOR nCnt := nTop + 1 TO nBottom - 1
+        @ nCnt, nRight SAY SUBS( frame, 4, 1 ) COLOR cColorH
+    NEXT
 
-   @ nBottom, nRight SAY SUBS( frame, 5, 1 ) COLOR cColorH
+    @ nBottom, nRight SAY SUBS( frame, 5, 1 ) COLOR cColorH
 
-   @ nBottom, nLeft + 1 SAY REPL( SUBS( frame, 6, 1 ),;
-      nRight - nLeft - 1 ) COLOR cColorH
+    @ nBottom, nLeft + 1 SAY REPL( SUBS( frame, 6, 1 ), ;
+        nRight - nLeft - 1 ) COLOR cColorH
 
-   RETURN NIL
-   
-   **-------------------------------------------------------------------
+    RETURN NIL
+
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BtnTitle( cName, nTop, nLeft, nWide, cColorN, isActiveButton )
 
-   LOCAL nPos
+    LOCAL nPos
 
-   IF ( isActiveButton == .T. )
-      cName := "_" + cName + "_"
-   ENDIF
+    IF ( isActiveButton == .T. )
+        cName := "_" + cName + "_"
+    ENDIF
 
-   /* display the title */
-   nPos := nLeft + (( nWide - LEN( cName ) ) / 2 ) + 1
-   @ nTop + 1, nPos SAY cName COLOR cColorN
+    /* display the title */
+    nPos := nLeft + ( ( nWide - Len( cName ) ) / 2 ) + 1
+    @ nTop + 1, nPos SAY cName COLOR cColorN
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BtnPos( aSelf, nPos )
 
-   LOCAL nRet := aSelf[ BN_POSI ]
+    LOCAL nRet := aSelf[ BN_POSI ]
 
-   IF !( nPos == NIL )
+    IF !( nPos == NIL )
 
-      DO CASE
+        DO CASE
 
-      CASE ( nPos < 1 )
-         aSelf[ BN_POSI ] := LEN( aSelf[ BN_ITEMS ] )
+        CASE ( nPos < 1 )
+            aSelf[ BN_POSI ] := Len( aSelf[ BN_ITEMS ] )
 
-      CASE ( nPos > LEN( aSelf[ BN_ITEMS ] ) )
-         aSelf[ BN_POSI ] := 1
+        CASE ( nPos > Len( aSelf[ BN_ITEMS ] ) )
+            aSelf[ BN_POSI ] := 1
 
-      OTHERWISE
-         aSelf[ BN_POSI ] := nPos
+        OTHERWISE
+            aSelf[ BN_POSI ] := nPos
 
-      ENDCASE
+        ENDCASE
 
-     /* unselect the button */
-      BtnSet( aSelf, nRet )
+        /* unselect the button */
+        BtnSet( aSelf, nRet )
 
-     /* select the button */
-      BtnSet( aSelf, aSelf[ BN_POSI ] )
+        /* select the button */
+        BtnSet( aSelf, aSelf[ BN_POSI ] )
 
-   ENDIF
+    ENDIF
 
-   RETURN nRet
+    RETURN nRet
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BtnGet( aSelf )
-   LOCAL nKey
 
-   IF ( aSelf[ BN_MODE ] == BN_DIM )
-      NormalButton( aSelf )
-   ENDIF
+    LOCAL nKey
 
-   WHILE ( .T. )
-      nKey := INKEY( 0 )
+    IF ( aSelf[ BN_MODE ] == BN_DIM )
+        NormalButton( aSelf )
+    ENDIF
 
-      DO CASE 
-         CASE nKey == K_ESC                 //  To Test Exit
+    WHILE ( .T. )
+        nKey := Inkey( 0 )
+
+        DO CASE
+        CASE nKey == K_ESC                 // To Test Exit
             EXIT
 
-         CASE nKey == aSelf[ BN_PREV ]
+        CASE nKey == aSelf[ BN_PREV ]
             BtnPos( aSelf, BtnPos( aSelf ) - 1 )
 
-         CASE nKey == aSelf[ BN_NEXT ]
+        CASE nKey == aSelf[ BN_NEXT ]
             BtnPos( aSelf, BtnPos( aSelf ) + 1 )
 
-         CASE nKey == K_ENTER .OR. ( UPPER( CHR( nKey )) $ aSelf[ BN_KSET ] )
+        CASE nKey == K_ENTER .OR. ( Upper( Chr( nKey ) ) $ aSelf[ BN_KSET ] )
             BtnEnter( nKey, aSelf )
             EXIT
 
-         ENDCASE
-   ENDDO
+        ENDCASE
+    ENDDO
 
-   DimButton( aSelf )
-   
-   RETURN nKey
+    DimButton( aSelf )
 
-   **-------------------------------------------------------------------
+    RETURN nKey
+
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION BtnEnter( nKey, aSelf )
 
-   IF ( UPPER( CHR( nKey )) $ aSelf[ BN_KSET ] )
-      BtnPos( aSelf, AT( UPPER( CHR( nKey )),;
-         aSelf[ BN_KSET ] ) )
-   ENDIF
+    IF ( Upper( Chr( nKey ) ) $ aSelf[ BN_KSET ] )
+        BtnPos( aSelf, At( Upper( Chr( nKey ) ),;
+            aSelf[ BN_KSET ] ) )
+    ENDIF
 
-   DimButton( aSelf, aSelf[ BN_POSI ] )
-   PAUSE( .25 )
+    DimButton( aSelf, aSelf[ BN_POSI ] )
+    PAUSE( .25 )
 
-   NormalButton( aSelf, aSelf[ BN_POSI ] )
-   PAUSE( .25 )
+    NormalButton( aSelf, aSelf[ BN_POSI ] )
+    PAUSE( .25 )
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION DimButton( aSelf, nButton )
 
-   aSelf[ BN_MODE ] := BN_DIM
-   BtnSet( aSelf, nButton )
+    aSelf[ BN_MODE ] := BN_DIM
+    BtnSet( aSelf, nButton )
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION NormalButton( aSelf, nButton )
 
-   aSelf[ BN_MODE ] := BN_NORM
-   BtnSet( aSelf, nButton )
+    aSelf[ BN_MODE ] := BN_NORM
+    BtnSet( aSelf, nButton )
 
-   RETURN NIL
+    RETURN NIL
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION ApColor( nItem, aColors )
-   STATIC aSet := NIL
 
-   IF ( aSet == NIL )
-      aSet := { "W/N,N/W,,,+W/N" }
-   ENDIF
+    STATIC aSet := NIL
 
-   IF !( aColors == NIL )
-      aSet := aColors
-   ENDIF
+    IF ( aSet == NIL )
+        aSet := { "W/N,N/W,,,+W/N" }
+    ENDIF
 
-   nItem := MIN( MAX( IF( nItem == NIL, 1, nItem ), 1 ), LEN( aSet ) )
+    IF !( aColors == NIL )
+        aSet := aColors
+    ENDIF
 
-   RETURN aSet[ nItem ]
+    nItem := Min( Max( IF( nItem == NIL, 1, nItem ), 1 ), Len( aSet ) )
 
-   **-------------------------------------------------------------------
+    RETURN aSet[ nItem ]
+
+// *-------------------------------------------------------------------
 
 STATIC FUNCTION GetColors( nSet )
 
-   STATIC aSet1 := { "W/N,N/W,,,+W/N",    "W/N",   "+W/N",  "N/W",   "W/N",  "N/W,+W/N,,,N/W",      "N/W",   "+W/W",  "W/N",  "N/W" }
-   STATIC aSet2 := { "+W/B,B/W,,,+W/B",   "+W/B",  "+R/B",  "+W/BG", "W/B",  "+W/BG,+W/B,,,+W/BG",  "+W/BG", "+R/BG", "+W/B", "W/BG" }
-   STATIC aSet3 := { "+W/*N,N/W,,,+W/*N", "+W/*N", "+R/*N", "+W/B",  "W/*N", "+W/*B,+W/B,,,+W/*B" , "+W/*B", "+R/*B", "+W/B", "W/*B" }
+    STATIC aSet1 := { "W/N,N/W,,,+W/N",    "W/N",   "+W/N",  "N/W",   "W/N",  "N/W,+W/N,,,N/W",      "N/W",   "+W/W",  "W/N",  "N/W" }
+    STATIC aSet2 := { "+W/B,B/W,,,+W/B",   "+W/B",  "+R/B",  "+W/BG", "W/B",  "+W/BG,+W/B,,,+W/BG",  "+W/BG", "+R/BG", "+W/B", "W/BG" }
+    STATIC aSet3 := { "+W/*N,N/W,,,+W/*N", "+W/*N", "+R/*N", "+W/B",  "W/*N", "+W/*B,+W/B,,,+W/*B", "+W/*B", "+R/*B", "+W/B", "W/*B" }
 
-   nSet := IF( nSet == NIL, IF( ISCOLOR(), 3, 1 ), nSet )
+    nSet := IF( nSet == NIL, IF( IsColor(), 3, 1 ), nSet )
 
-   RETURN { aSet1, aSet2, aSet3 }[ MIN( MAX( nSet, 1 ), 3 ) ]
+    RETURN { aSet1, aSet2, aSet3 }[ Min( Max( nSet, 1 ), 3 ) ]
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 FUNCTION PressedEsc()
 
-   LOCAL escPressed := (LASTKEY() == K_ESC)
-   
-   RETURN escPressed
+    LOCAL escPressed := ( LastKey() == K_ESC )
 
-   *******---------------------  END OF FILE _APPX.PRG
-
+    RETURN escPressed
+
+// ******---------------------  END OF FILE _APPX.PRG

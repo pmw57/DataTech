@@ -1,9 +1,9 @@
-*** JoKir02   25-02-11 05:43:46 
+// ** JoKir02   25-02-11 05:43:46
 
-***          Afunc needed 
-*** PAWILK10 03-10-13 23:20:20
-***          Fix Mfunc so memoedit doesn't endlessly loop, and
-***          apply some static variables to make the code easier to understand
+// **          Afunc needed
+// ** PAWILK10 03-10-13 23:20:20
+// **          Fix Mfunc so memoedit doesn't endlessly loop, and
+// **          apply some static variables to make the code easier to understand
 
 
 /*  Program.....:                 _LF_INIT.PRG
@@ -11,18 +11,18 @@
     Date........:  26/12/1994
     Functions...:  Afunc, MFunc, Printest, Initenv,
                    Chkcode, Reindx, Lastused.
-                   Contdbf(),  Start 
+                   Contdbf(),  Start
 */
 
 #include "Default.ch"        // Custom commands.
 
 FUNCTION Princhk()
 
-LOCAL npcount, prnscrn  // This must come first !
+    LOCAL npcount, prnscrn  // This must come first !
 
-IF ISPRINTER()                 // Check to see if we need to go on first
-  RETURN .T.
-ENDIF
+    IF IsPrinter()                 // Check to see if we need to go on first
+        RETURN .T.
+    ENDIF
 
 /*
 mwhere := "P"
@@ -72,114 +72,115 @@ ENDDO
 RETURN .T.             // Don't terminate (mtrue = "N")
 
 */
-*****  End of Princhk()
+    // ****  End of Princhk()
 
-***-------------------------------------------------------------------------
+    // **-------------------------------------------------------------------------
 
 FUNCTION Afunc( amode, apos, ascr )
 
-  * Mode of ACHOICE; Array element; Screen element number
+    // Mode of ACHOICE; Array element; Screen element number
 
-  whatkey := LASTKEY()
+    whatkey := LastKey()
 
-  IF whatkey == 27
-     RETURN(1)
-  ENDIF
+    IF whatkey == 27
+        RETURN( 1 )
+    ENDIF
 
-  IF amode == 2                         // The end of the list
-     KEYBOARD CHR(31)                  // = Ctrl Page Up
-     RETURN(2)
+    IF amode == 2                         // The end of the list
+        KEYBOARD Chr( 31 )                  // = Ctrl Page Up
+        RETURN( 2 )
     ELSEIF amode == 1                   // Cursor past top of list
-     KEYBOARD CHR(30)                  // = Ctrl Page Down
-     RETURN(2)
+        KEYBOARD Chr( 30 )                  // = Ctrl Page Down
+        RETURN( 2 )
     ELSEIF amode == 3                   // Keystroke exception
-     DO CASE
+        DO CASE
         CASE whatkey == 4               // End Right Arrow
-           KEYBOARD CHR(30)
-           RETURN(1)
+            KEYBOARD Chr( 30 )
+            RETURN( 1 )
         CASE whatkey == 19               // End Left Arrow
-           KEYBOARD CHR(30)
-           RETURN(1)
+            KEYBOARD Chr( 30 )
+            RETURN( 1 )
         CASE whatkey == 6               // End key
-           KEYBOARD CHR(30)
-           RETURN(2)
+            KEYBOARD Chr( 30 )
+            RETURN( 2 )
         CASE whatkey == 1               // Home key
-           KEYBOARD CHR(31)
-           RETURN(2)
+            KEYBOARD Chr( 31 )
+            RETURN( 2 )
         CASE whatkey == 13              // Enter key
-           RETURN(1)
+            RETURN( 1 )
         CASE whatkey == -1              // F2
-           RETURN(1)
+            RETURN( 1 )
         CASE whatkey == -2              // F3
-           RETURN(1)
+            RETURN( 1 )
         CASE whatkey == -3              // F4
-           RETURN(1)
+            RETURN( 1 )
         OTHERWISE
-           RETURN(2)
-     ENDCASE
+            RETURN( 2 )
+        ENDCASE
     ELSE
-     RETURN(2)
-  ENDIF
+        RETURN( 2 )
+    ENDIF
 
-RETURN( 2 )
+    RETURN( 2 )
 
-*** End of Function Afunc
+// ** End of Function Afunc
 
-**-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 FUNCTION Mfunc( nmode, nrow, ncol )  // Function for MEMOEDIT
-                                     // Ex Straley pp 696-7
-                                     // Now streamlined !
 
-   LOCAL nRetValue := 0
+    // Ex Straley pp 696-7
+    // Now streamlined !
 
-   STATIC pINS := 22, pLEFT_ARROW := 19, pRIGHT_ARROW := 4, pF10 := -9
+    LOCAL nRetValue := 0
 
-   IF nmode==1 .OR. nmode==2
+    STATIC pINS := 22, pLEFT_ARROW := 19, pRIGHT_ARROW := 4, pF10 := -9
 
-      DO CASE
-         CASE LASTKEY() == pINS      // INSERT key
-            READINSERT( !READINSERT() ) // Toggle Insert/Overwrite
-            KEYBOARD CHR(pRIGHT_ARROW) + CHR(pLEFT_ARROW)
-            SETCURSOR( IF( READINSERT(), 3, 1 ) ) // Change cursor form
+    IF nmode == 1 .OR. nmode == 2
+
+        DO CASE
+        CASE LastKey() == pINS      // INSERT key
+            ReadInsert( !ReadInsert() ) // Toggle Insert/Overwrite
+            KEYBOARD Chr( pRIGHT_ARROW ) + Chr( pLEFT_ARROW )
+            SetCursor( IF( ReadInsert(), 3, 1 ) ) // Change cursor form
             nRetValue := 32
 
-         CASE LASTKEY() == pF10     // F-10 key = ALT-W
-            SETCURSOR( 1 )          // Reset Cursor non Flashing
-            READINSERT( .F. )    
+        CASE LastKey() == pF10     // F-10 key = ALT-W
+            SetCursor( 1 )          // Reset Cursor non Flashing
+            ReadInsert( .F. )
             nRetValue := 23         // (Finish editing & save)
-      ENDCASE
+        ENDCASE
 
-   ENDIF
+    ENDIF
 
-   RETURN nRetValue
+    RETURN nRetValue
 
-**  End of Function  --  MFUNC  **
+// *  End of Function  --  MFUNC  **
 
-**-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 FUNCTION PrintselY()
 
-      mwhere := ApGetY( "Do you Want Printer" )
-      IF mwhere == "Y"
+    mwhere := ApGetY( "Do you Want Printer" )
+    IF mwhere == "Y"
 
-         Princhk()                            // Below
-         @  0, 0
-         SET PRINTER TO
-         SET DEVICE TO PRINT
-         npl    := 55
-         mwhere := "P"
-        ELSE
-         SCROLL()
-         npl    := 18
-         mwhere := "S"
-      ENDIF 
+        Princhk()                            // Below
+        @  0, 0
+        SET PRINTER TO
+        SET DEVICE TO PRINT
+        npl    := 55
+        mwhere := "P"
+    ELSE
+        Scroll()
+        npl    := 18
+        mwhere := "S"
+    ENDIF
 
-RETURN( mwhere, npl )
+    RETURN( mwhere, npl )
 
-***** End of PrintselY()
+// **** End of PrintselY()
 
-**-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 /*
             SCROLL()
@@ -189,45 +190,45 @@ RETURN( mwhere, npl )
 */
 
 
-**-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 FUNCTION Disclaimer()
 
-LOCAL cmessage
+    LOCAL cmessage
 
-SELECT Control
-cmessage := Message->Copy_Rt1
-cmessage += Message->Copy_Rt2
+    SELECT Control
+    cmessage := Message->Copy_Rt1
+    cmessage += Message->Copy_Rt2
 
-IF ALERT( cmessage, { "CONTINUE", "QUIT" } ) == 2
-   QUIT
-ENDIF
+    IF Alert( cmessage, { "CONTINUE", "QUIT" } ) == 2
+        QUIT
+    ENDIF
 
-RETURN .T.
+    RETURN .T.
 
-***---- End of Disclaimer()
+// **---- End of Disclaimer()
 
-**-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 FUNCTION Initenv()                          // Set working environment
 
-  PUBLIC c_stdcolor, c_hicolor, c_fcolor, mcodeno, mpartnum, minvno, mwhere,;
-         npl, nl, mnote, mmodcode, aCatcode_, mcashno, msaleno, mjobnum,;
-         cedit, quotcodeno, cbranchid, coperno
+    PUBLIC c_stdcolor, c_hicolor, c_fcolor, mcodeno, mpartnum, minvno, mwhere, ;
+        npl, nl, mnote, mmodcode, aCatcode_, mcashno, msaleno, mjobnum, ;
+        cedit, quotcodeno, cbranchid, coperno
 
-  IF ISCOLOR()
-     M->c_stdcolor:= "W+/B, GR+/R, B"
-     M->c_hicolor := "GR+/R, , "
-     M->c_fcolor  := "*W+/B"
+    IF IsColor()
+        M->c_stdcolor := "W+/B, GR+/R, B"
+        M->c_hicolor := "GR+/R, , "
+        M->c_fcolor  := "*W+/B"
     ELSE
-     M->c_stdcolor:= "W,I"
-     M->c_hicolor := "I"
-     M->c_fcolor  := "*W+"
-  ENDIF
-SETCOLOR(M->c_stdcolor)
+        M->c_stdcolor := "W,I"
+        M->c_hicolor := "I"
+        M->c_fcolor  := "*W+"
+    ENDIF
+    SetColor( M->c_stdcolor )
 
-  IF ISCOLOR()
-     c_stdcolor  := "W+/B, GR+/R, B"        // This is Standard all Blue
+    IF IsColor()
+        c_stdcolor  := "W+/B, GR+/R, B"        // This is Standard all Blue
 
 /*
 
@@ -239,51 +240,51 @@ SETCOLOR(M->c_stdcolor)
 ****  Light Blue  POOR
      c_stdcolor := ( "+W/*N,N/W,,,+W/*N",;
                     "W/*N","R/*N","W/B","W/*N",;
-                    "W/*B,+W/B,,,W/*B",; 
-                    "W/*B","+R/*B","W/B","W/*B" ) 
-****   Black and White 
+                    "W/*B,+W/B,,,W/*B",;
+                    "W/*B","+R/*B","W/B","W/*B" )
+****   Black and White
      c_stdcolor := ( "W/N,N/W,,,+W/N",;
                     "W/N","W/N","N/W","W/N",;
-                    "N/W,+W/N,,,N/W",; 
-                    "N/W","+W/W","W/N","N/W" ) 
+                    "N/W,+W/N,,,N/W",;
+                    "N/W","+W/W","W/N","N/W" )
 ****   GREAN
      c_stdcolor :=  ( "W/B,B/W,,,+W/B",;
                     "+W/B","+R/B","+W/BG","W/B",;
-                    "+W/BG,+W/B,,,+W/BG",; 
-                    "+W/BG","+R/BG","W/B","W/BG" ) 
+                    "+W/BG,+W/B,,,+W/BG",;
+                    "+W/BG","+R/BG","W/B","W/BG" )
 */
 
-     c_hicolor  := "GR+/R, , "
-     c_fcolor   := "*W+/B"
+        c_hicolor  := "GR+/R, , "
+        c_fcolor   := "*W+/B"
     ELSE
-     c_stdcolor := "W,I"
-     c_hicolor  :="I"
-     c_fcolor := "*W+"
-  ENDIF
+        c_stdcolor := "W,I"
+        c_hicolor  := "I"
+        c_fcolor := "*W+"
+    ENDIF
 
-  SETCOLOR( c_stdcolor )
+    SetColor( c_stdcolor )
 
-***  SET EPOCH TO 1990  // YEAR( DATE() )
-  SET CENTURY ON
-  SET DEVICE TO SCREEN
-  SET TALK OFF
-  SET BELL OFF
-  SET SCOREBOARD OFF
-  SET ESCAPE ON
-  SET EXACT OFF
-  SET CONFIRM ON
-  SET DATE BRITISH
-  SET DELIMITERS ON
-  SET DELIMITERS TO "[]"
-  SET DELETE ON
-  SETCURSOR( 1 )                    // 3 = Big
-  **  SET PATH TO          ????????
+    // **  SET EPOCH TO 1990  // YEAR( DATE() )
+    SET CENTURY ON
+    SET DEVICE TO SCREEN
+    SET TALK OFF
+    SET BELL OFF
+    SET SCOREBOARD OFF
+    SET ESCAPE ON
+    SET EXACT OFF
+    SET CONFIRM ON
+    SET DATE BRITISH
+    SET DELIMITERS ON
+    SET DELIMITERS TO "[]"
+    SET DELETE ON
+    SetCursor( 1 )                    // 3 = Big
+    // *  SET PATH TO          ????????
 
-RETURN NIL
+    RETURN NIL
 
-******** End of Initenv()
+// ******* End of Initenv()
 
-**-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 /*
 TAKEN OUT
 
@@ -315,49 +316,48 @@ RETURN( mreindx )
 Taken Out
 */
 
-**-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
 FUNCTION Lastused( nl )                         // Display `last-used' date
 
-   PRIVATE mdate, mdayn, mdayc, myrn, myrc
+    PRIVATE mdate, mdayn, mdayc, myrn, myrc
 
-   mdate := CDOW( Control->Lastdate )+","
-   mdayn := DAY(  Control->Lastdate )
-   mdayc := STR( mdayn )
-   mdate := mdate+LTRIM( mdayc )+" "
-   mdate := mdate+CMONTH( Control->Lastdate )+","
-   myrn  := YEAR( Control->Lastdate )
-   myrc  := STR( myrn )
+    mdate := CDoW( Control->Lastdate ) + ","
+    mdayn := Day(  Control->Lastdate )
+    mdayc := Str( mdayn )
+    mdate := mdate + LTrim( mdayc ) + " "
+    mdate := mdate + CMonth( Control->Lastdate ) + ","
+    myrn  := Year( Control->Lastdate )
+    myrc  := Str( myrn )
 
-***   SCROLL( nl, 2, nl,78 ) 
-   @ 21,32 SAY "Last Used "+mdate+LTRIM(myrc);
-                +" "+Control->LastTime COLOR "RG+"
+    // **   SCROLL( nl, 2, nl,78 )
+    @ 21, 32 SAY "Last Used " + mdate + LTrim( myrc );
+        + " " + Control->LastTime COLOR "RG+"
 
-RETURN NIL
+    RETURN NIL
 
-***------ End Lastused()
+// **------ End Lastused()
 
-**------------------------------------------------------------------------
+// *------------------------------------------------------------------------
 
 FUNCTION CENTRESAY( nrow, msg, nLeftPadding )  // 'SAY's message on specified line, centred
 
-   DEFAULT NUMERIC nLEFTPadding TO 0
+    DEFAULT NUMERIC nLEFTPadding TO 0
 
-   @ nrow, nLeftPadding + INT( ( MAXCOL() - LEN(msg) ) /2 ) SAY msg
+    @ nrow, nLeftPadding + Int( ( MaxCol() - Len(msg ) ) / 2 ) SAY msg
 
-   RETURN NIL
+    RETURN NIL
 
-**  End of Function  --  CENTRESAY  **
+// *  End of Function  --  CENTRESAY  **
 
-***--------------------------------------------------------------------------
+// **--------------------------------------------------------------------------
 
 FUNCTION Centre( msg )    // Centralises message no leading/trailing blanks
 
-RETURN INT( ( MAXCOL() - LEN( msg ) ) /2 )
+    RETURN Int( ( MaxCol() - Len( msg ) ) / 2 )
 
-**  End of --  Centre()
+// *  End of --  Centre()
 
-**------------------------------------------------------------------------
+// *------------------------------------------------------------------------
 
-******--------------------  END OF FILE _LF_INIT.PRG
-
+// *****--------------------  END OF FILE _LF_INIT.PRG

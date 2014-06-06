@@ -1,6 +1,6 @@
-   ***   JK 29-08-11 07:49:45 
+// **   JK 29-08-11 07:49:45
 
-/* 
+/*
    Program ......:            _CON_SEC.PRG
 
    Authors.......: John Kirby
@@ -20,7 +20,7 @@ FUNCTION Control()
        ApRLock( 3 )
       Control->LastJob := c_stdcolor
       UNLOCK
-   ENDIF   
+   ENDIF
    */
 
    /*
@@ -42,9 +42,9 @@ FUNCTION Control()
 
    /*
    TAKEN OUT
-       IF Control->Lastchge != ( Control->SetDate )           
+       IF Control->Lastchge != ( Control->SetDate )
             ? REPLICATE(chr(7), 3)
-         
+
            TEXT
 
            SORRY, You are no longer authorised to use this program . If you have
@@ -56,95 +56,95 @@ FUNCTION Control()
                   Thank you for your Time  BYE BYE !!!!!!
 
          ENDTEXT
-         WAIT "         ILLEGAL COPYING IS THEFT AS YOU WELL KNOW " 
+         WAIT "         ILLEGAL COPYING IS THEFT AS YOU WELL KNOW "
       ENDIF
    taken out
    */
-   RETURN NIL
+    RETURN NIL
 
-   ***------------------------------------------------------------------*
+// **------------------------------------------------------------------*
 
-   FUNCTION Passcode()
+FUNCTION Passcode()
 
-   LOCAL mcode   := SPACE(6)
-   LOCAL nchksum := 0
+    LOCAL mcode   := Space( 6 )
+    LOCAL nchksum := 0
 
-   mcode := GenerateCode( Control->EntLev1 )
-   nchksum := Checksum( TRIM(Control->EntLev1) )
-   mcode += CHR( INT( nchksum / 256 ) ) + CHR( nchksum%256 )
+    mcode := GenerateCode( Control->EntLev1 )
+    nchksum := Checksum( Trim( Control->EntLev1 ) )
+    mcode += Chr( Int( nchksum / 256 ) ) + Chr( nchksum % 256 )
 
-   // Create security code ( now 6 chrs long )
-   ApRLock( 3 )
-   REPLACE Control->EntLev1 WITH mcode
-   UNLOCK
+    // Create security code ( now 6 chrs long )
+    ApRLock( 3 )
+    REPLACE Control->EntLev1 WITH mcode
+    UNLOCK
 
-   RETURN NIL
+    RETURN NIL
 
-   ***---- End Passcode()
+// **---- End Passcode()
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
-   FUNCTION Encode()
+FUNCTION Encode()
 
-   LOCAL mcode := SPACE(4)
-   LOCAL mname := TRIM( Control->U_Name )
+    LOCAL mcode := Space( 4 )
+    LOCAL mname := Trim( Control->U_Name )
 
-   DO WHILE LEN(mname) < 7
-   mname := mname+TRIM( Control->U_Name )
-   ENDDO
-   mcode := GenerateCode( mname )
+    DO WHILE Len( mname ) < 7
+        mname := mname + Trim( Control->U_Name )
+    ENDDO
+    mcode := GenerateCode( mname )
 
-   IF Control->Code != mcode
-   IF SUBSTR( Control->Code, 1, 3 ) = SUBSTR( Control->U_Name, 1, 3 )
-   RETURN NIL
-   ELSE
-   SCROLL()
-   ? REPLICATE(chr(7), 6)
-   @  5,10 SAY "CONTROL RECORDS INVALID !!!"
-   @  7,10 SAY "Please call your supplier."
-   @  9,15 SAY "Press any key to continue ..."
-   WAIT ""
-   CANCEL
-   ENDIF
-   ENDIF
+    IF Control->Code != mcode
+        IF SubStr( Control->Code, 1, 3 ) = SubStr( Control->U_Name, 1, 3 )
+            RETURN NIL
+        ELSE
+            Scroll()
+            ? Replicate( Chr( 7 ), 6 )
+            @  5, 10 SAY "CONTROL RECORDS INVALID !!!"
+            @  7, 10 SAY "Please call your supplier."
+            @  9, 15 SAY "Press any key to continue ..."
+            WAIT ""
+            CANCEL
+        ENDIF
+    ENDIF
 
-   RETURN NIL
+    RETURN NIL
 
-   **------- End of EnCode()
+// *------- End of EnCode()
 
-   **-------------------------------------------------------------------
+// *-------------------------------------------------------------------
 
-   FUNCTION GenerateCode( mname )
+FUNCTION GenerateCode( mname )
 
-   LOCAL mna1  := SUBSTR(mname,5,1)
-   LOCAL mna2  := SUBSTR(mname,3,1)
-   LOCAL mna3  := SUBSTR(mname,6,1)
-   LOCAL mna4  := SUBSTR(mname,1,1)
-   LOCAL mnc1  := asc(mna1) + 137
-   LOCAL mnc2  := asc(mna2) + 6
-   LOCAL mnc3  := asc(mna3) * 2
-   LOCAL mnc4  := asc(mna4) + 91
-   LOCAL mch1  := chr(mnc1)
-   LOCAL mch2  := chr(mnc2)
-   LOCAL mch3  := chr(mnc3)
-   LOCAL mch4  := chr(mnc4)
-   
-   RETURN mch1 + mch2 + mch3 + mch4
+    LOCAL mna1  := SubStr( mname, 5, 1 )
+    LOCAL mna2  := SubStr( mname, 3, 1 )
+    LOCAL mna3  := SubStr( mname, 6, 1 )
+    LOCAL mna4  := SubStr( mname, 1, 1 )
+    LOCAL mnc1  := Asc( mna1 ) + 137
+    LOCAL mnc2  := Asc( mna2 ) + 6
+    LOCAL mnc3  := Asc( mna3 ) * 2
+    LOCAL mnc4  := Asc( mna4 ) + 91
+    LOCAL mch1  := Chr( mnc1 )
+    LOCAL mch2  := Chr( mnc2 )
+    LOCAL mch3  := Chr( mnc3 )
+    LOCAL mch4  := Chr( mnc4 )
 
-   ***---- End GenerateCode()
+    RETURN mch1 + mch2 + mch3 + mch4
 
-   **-------------------------------------------------------------------
+// **---- End GenerateCode()
 
-   FUNCTION Checksum( cstring )
+// *-------------------------------------------------------------------
 
-   LOCAL nstrlen := LEN( cstring )
-   LOCAL npos    := 1
-   
-   DO WHILE npos <= nstrlen
-   nchksum = nchksum + ASC( SUBSTR( cstring, npos, 1 ) )
-   npos = npos + 1
-   ENDDO
-   
-   **------- End of Checksum()
+FUNCTION Checksum( cstring )
 
-   *****---------------------     END OF FILE _CON_SEC.PRG
+    LOCAL nstrlen := Len( cstring )
+    LOCAL npos    := 1
+
+    DO WHILE npos <= nstrlen
+        nchksum = nchksum + Asc( SubStr( cstring, npos, 1 ) )
+        npos = npos + 1
+    ENDDO
+
+    // *------- End of Checksum()
+
+    // ****---------------------     END OF FILE _CON_SEC.PRG

@@ -1,4 +1,4 @@
-***  JK 17-09-11 08:01:35 
+// **  JK 17-09-11 08:01:35
 
 /*           ...:              CHRIMAIN.PRG
     Authors.....: J.Kirby
@@ -8,49 +8,48 @@
 
 FUNCTION Main()
 
-   InitMain()
-   InitAppx()
-   InitMenu()
+    InitMain()
+    InitAppx()
+    InitMenu()
 
-   RETURN NIL
+    RETURN NIL
 
 FUNCTION InitMain()
 
-InitFiles()                             // XF_Util
+    InitFiles()                             // XF_Util
  	
-IF InitFiles()
-   SCROLL()
+    IF InitFiles()
+        Scroll()
 
-    DBFReinDx()                                 // CalRendx
+        DBFReinDx()                                 // CalRendx
 
-ENDIF   
+    ENDIF
 
-Initenv()                                     // _LP_Init Initiates Environment
+    Initenv()                                     // _LP_Init Initiates Environment
 
-RETURN NIL
+    RETURN NIL
 
-***--------------------------------------------------------------
+// **--------------------------------------------------------------
 
 FUNCTION InitMenu()
 
-SCROLL()
+    Scroll()
 
-*** ApAbout()         // AppX.PRG Shows Welcome and Conditions
+    // ** ApAbout()         // AppX.PRG Shows Welcome and Conditions
 
- Start()                                       // MetMenu.PRG
+    Start()                                       // MetMenu.PRG
 
- Menu()                                        // MetMenu.PRG
+    MENU()                                        // MetMenu.PRG
 
-Wipe( .01 )                                    // AppX.PRG
+    Wipe( .01 )                                    // AppX.PRG
 
-*** ApBye()          // AppX.PRG This gives Welcome and Conditions
+    // ** ApBye()          // AppX.PRG This gives Welcome and Conditions
 
-   /* reset dos error code */
-   ERRORLEVEL( 0 )
+    /* reset dos error code */
+    ErrorLevel( 0 )
 
-SET COLOR TO W, W+
+    SET COLOR TO W, W +
 
-RETURN NIL
+    RETURN NIL
 
-*******------------------ END OF FILE CHRIMain.PRG
-
+// ******------------------ END OF FILE CHRIMain.PRG
