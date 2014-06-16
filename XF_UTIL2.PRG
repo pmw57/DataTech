@@ -808,6 +808,7 @@ FUNCTION OrdbyOld()
                         Ordscrn( mordnum )                      // Above
                     ENDIF
 
+                    EndPrint()
                     mtrue := "N"
                     // *** ApGetN( "Another Display/Print :" )
                 ENDDO                    // mtrue
