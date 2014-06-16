@@ -623,8 +623,8 @@ FUNCTION LabXYParts()
         IF Status->Received > Status->Required
             notJC += ( Status->Received - Status->Required ) * Part->Trade
             @ nl, 34 SAY SubStr( Part->Desc, 1, 15 )
-            @ nl, 50 SAY ( Status->Received - Status->Required );
-                // Part->Trade PICTURE "$9999.99"
+            @ nl, 50 SAY ( Status->Received - Status->Required ) * Part->Trade;
+                PICTURE "$9999.99"
         ELSE
             @ nl, 34 SAY SubStr( Part->Desc, 1, 23 )
         ENDIF
@@ -926,8 +926,8 @@ FUNCTION LabPList( mmodcode )
         IF Status->Received > Status->Required
             notJC += ( Status->Received - Status->Required ) * Part->Trade
             @ nl, 34 SAY SubStr( Part->Desc, 1, 15 )
-            @ nl, 50 SAY ( Status->Received - Status->Required );
-                // Part->Trade PICTURE "$9999.99"
+            @ nl, 50 SAY ( Status->Received - Status->Required ) * Part->Trade;
+                PICTURE "$9999.99"
         ELSE
             @ nl, 34 SAY SubStr( Part->Desc, 1, 23 )
         ENDIF

@@ -379,7 +379,8 @@ FUNCTION QuotSearch()
 // *-------------------------------------------------------------------
 
 FUNCTION QuoLook( mcodeno, cbranchId )
-
+    local discountAmount
+    
     minvno    := Debit->Invno
     mcodeno   := Debit->Codeno
     cbranchid := Debit->BranchId
@@ -407,14 +408,13 @@ FUNCTION QuoLook( mcodeno, cbranchId )
             SELECT Part
             SEEK mpartnum
             SELECT Quot
-            ntotal += ( ( Quot->Amount * Quot->Qty );
-                // (1-Quot->Discount/100 )*100 ) /100.00
+            discountAmount := Quot->Amount * ( 1 - Quot->Discount/100 )
+            ntotal += ( Quot->Qty * discountAmount * 100 ) / 100.00
             AAdd( aPart_, SubStr( Part->Partnum,1,13 );
                 + " " + SubStr( Part->Desc, 1, 28 );
                 + " " + Str( Quot->Qty, 8, 2 );
                 + " " + Str( Quot->Amount, 9, 2 );
-                + " " + Str(  ( ( Quot->Amount * Quot->Qty );
-                // (1-Quot->Discount/100 )*100 ) /100.00, 9, 2 );
+                + " " + Str(  ( Quot->Qty * discountAmount * 100 ) /100.00, 9, 2 );
             + " " + cbranchid )
             SKIP ALIAS Quot
         ENDDO

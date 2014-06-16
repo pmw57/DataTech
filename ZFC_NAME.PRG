@@ -1,6 +1,6 @@
-// *  JK 24-08-10 08:40:34
+// **  JK 24-08-10 08:40:34 
 
-// *** REM Specific Name ( Caldwell )
+// **** REM Specific Name ( Caldwell )
 
 /*  Program......:              ZFC_NAME.PRG
     Author.......: J.Kirby
@@ -10,7 +10,7 @@
 
 // (c) Copyright 1993 by Chozen Ltd Christchurch.
 
-DO ZSF_Name
+// DO ZSF_Name
 
 FUNCTION MenuName( nc, nl )
 

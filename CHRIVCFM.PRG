@@ -511,7 +511,8 @@ FUNCTION IvcFormA( mcodeno )    // CPL Screen
 // *-------------------------------------------------------------------
 
 FUNCTION IvcLook( minvno )
-
+    local discountAmount
+    
     aPart_ := {}
     nqtyorg := nivcTotal := 0
     SELECT Invoice
@@ -524,15 +525,17 @@ FUNCTION IvcLook( minvno )
         SEEK Invoice->Partnum
         SELECT Invoice
         ApRLock( 3 )
-        mA := ( ( Invoice->Amount * ( 1 -Invoice->Discount / 100 ) * 100 ) / 100 );
-            // Invoice->Qty
+        discountAmount := Invoice->Amount * ( 1 - Invoice->Discount / 100 )
+        mA := ( ( discountAmount * 100 ) / 100 ) * Invoice->Qty
         UNLOCK
         ncnt++
-        AAdd( aPart_, SubStr( Invoice->Partnum, 1,10 ) + " " + SubStr( Part->Desc, 1,28 ) + " " + Str( Invoice->Qty,8 );
-            + " " + Str( Invoice->Amount, 8, 2 ) + " " + Str( Invoice->Discount, 6, 2 );
-            + "%" + Str( mA, 9, 2 ) )
-        nivcTotal := ( nivcTotal + ( ( Invoice->Amount * ( 1 -Invoice->Discount / 100 );
-            // 100 )/100 )*Invoice->Qty )
+        AAdd( aPart_, SubStr( Invoice->Partnum, 1,10 ) + " ";
+            + SubStr( Part->Desc, 1,28 ) + " ";
+            + Str( Invoice->Qty,8 ) + " ";
+            + Str( Invoice->Amount, 8, 2 ) + " ";
+            + Str( Invoice->Discount, 6, 2 ) + "%" + Str( mA, 9, 2 ) )
+        discountAmount := Invoice->Amount * ( 1 -Invoice->Discount / 100 )
+        nivcTotal := nivcTotal + ( ( discountAmount * 100 ) / 100 ) * Invoice->Qty
         SKIP ALIAS Invoice
     ENDDO
     SET ORDER TO 1                  // Invno+Partnum

@@ -11,7 +11,8 @@
 */
 
 FUNCTION QuotProf()
-
+    local discountAmount
+    
     Scroll()
     DispBox( 0, 1, 18, 79, 2 )
     @  1, 20 SAY "Quote Analysis"
@@ -104,8 +105,8 @@ FUNCTION QuotProf()
             SELECT Part
             SEEK Quot->Partnum
             SELECT Quot
-            mA := ( ( Quot->Amount * ( 1 -Quot->Discount / 100 ) * 100 ) / 100 );
-                // Quot->Qty
+            discountAmount := Quot->Amount * ( 1 -Quot->Discount / 100 )
+            mA := ( ( discountAmount * 100 ) / 100 ) * Quot->Qty
             ntrade    := Part->Trade * Quot->Qty
             nsale     += mA
             ncostitem += ntrade

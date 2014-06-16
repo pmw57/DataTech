@@ -189,7 +189,8 @@ FUNCTION SBSList()
 // **---------------------------------------------------------------------------
 
 FUNCTION Jsheet( mcodeno )
-
+    local discountAmount
+    
     cbranchId := Space( 2 )
     minvno := Space( 6 )
     SELECT Debit
@@ -287,15 +288,14 @@ FUNCTION Jsheet( mcodeno )
                     SELECT Part
                     SEEK Invoice->Partnum
                     SELECT Invoice
-                    mA := ( ( Invoice->Amount * ( 1 -Invoice->Discount / 100 ) * 100 ) / 100 );
-                        // Invoice->Qty
+                    mA := ( ( discountAmount * 100 ) / 100 ) * Invoice->Qty
                     AAdd( aPart_, SubStr( Invoice->Partnum,1,7 );
                         + " " + SubStr( Part->Desc, 1, 22 ) + " " + Str( Invoice->Qty, 7 );
                         + " " + Str( Invoice->Amount, 8, 2 ) + " " + Str( Invoice->Discount );
                         + "%" + Str( mA, 8, 2 ) + " " + DToC( Invoice->PDate );
                         + "           " + Str( RecNo(), 6 ) )
-                    nivcTotal := ( nivcTotal + ( ( Invoice->Amount * ( 1 -Invoice->Discount / 100 );
-                        // 100 )/100 )*Invoice->Qty )
+                    discountAmount := Invoice->Amount * ( 1 -Invoice->Discount / 100 )
+                    nivcTotal := ( nivcTotal + ( ( discountAmount * 100 ) / 100 )*Invoice->Qty )
                     SKIP ALIAS Invoice
                 ENDDO
                 SET ORDER TO 1                  // Invno+Partnum

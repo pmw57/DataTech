@@ -1287,42 +1287,28 @@ FUNCTION MetTime()
                 // ** NOW DO PAYE
                 DO CASE     // Tax code
                 CASE nPaya > TaxRates->Brk4                       // $ 85,795
-                    nTax := ( nPaya - TaxRates->Brk4 );
-                        // ( TaxRates->Brk5Rate/100 )
-                    nTax += ( TaxRates->Brk4 - TaxRates->Brk3 );
-                        // ( TaxRates->Brk4Rate/100 )
-                    nTax += ( TaxRates->Brk3 - TaxRates->Brk2 );
-                        // ( TaxRates->Brk3Rate/100 )
-                    nTax += ( TaxRates->Brk2 - TaxRates->Brk1 );
-                        // ( TaxRates->Brk2Rate/100 )
-                    nTax += TaxRates->Brk1;
-                        // ( TaxRates->Brk1Rate/100 )
+                    nTax := ( nPaya - TaxRates->Brk4 ) * ( TaxRates->Brk5Rate/100 )
+                    nTax += ( TaxRates->Brk4 - TaxRates->Brk3 ) * ( TaxRates->Brk4Rate/100 )
+                    nTax += ( TaxRates->Brk3 - TaxRates->Brk2 ) * ( TaxRates->Brk3Rate/100 )
+                    nTax += ( TaxRates->Brk2 - TaxRates->Brk1 ) * ( TaxRates->Brk2Rate/100 )
+                    nTax += TaxRates->Brk1 * ( TaxRates->Brk1Rate/100 )
                 CASE nPaya > TaxRates->Brk3                       // $ 60,000
-                    nTax := ( nPaya - TaxRates->Brk3 );
-                        // ( TaxRates->Brk4Rate/100 )
-                    nTax += ( TaxRates->Brk3 - TaxRates->Brk2 );
-                        // ( TaxRates->Brk3Rate/100 )
-                    nTax += ( TaxRates->Brk2 - TaxRates->Brk1 );
-                        // ( TaxRates->Brk2Rate/100 )
-                    nTax += TaxRates->Brk1;
-                        // ( TaxRates->Brk1Rate/100 )
+                    nTax := ( nPaya - TaxRates->Brk3 ) * ( TaxRates->Brk4Rate/100 )
+                    nTax += ( TaxRates->Brk3 - TaxRates->Brk2 ) * ( TaxRates->Brk3Rate/100 )
+                    nTax += ( TaxRates->Brk2 - TaxRates->Brk1 ) * ( TaxRates->Brk2Rate/100 )
+                    nTax += TaxRates->Brk1 * ( TaxRates->Brk1Rate/100 )
                 CASE nPaya > TaxRates->Brk2                       // $ 38,000
-                    nTax := ( nPaya - ( TaxRates->Brk2 ) );
-                        // ( TaxRates->Brk3Rate/100 )
-                    nTax += ( TaxRates->Brk2 - TaxRates->Brk1 );
-                        // ( TaxRates->Brk2Rate/100 )
-                    nTax += TaxRates->Brk1;
-                        // ( TaxRates->Brk1Rate/100 )
+                    nTax := ( nPaya - ( TaxRates->Brk2 ) ) * ( TaxRates->Brk3Rate/100 )
+                    nTax += ( TaxRates->Brk2 - TaxRates->Brk1 ) * ( TaxRates->Brk2Rate/100 )
+                    nTax += TaxRates->Brk1 * ( TaxRates->Brk1Rate/100 )
                 CASE npaya > TaxRates->Brk1                        // $ 9,500
-                    nTax := ( npaya - TaxRates->Brk1 );
-                        // ( TaxRates->Brk2Rate/100 )
-                    nTax += TaxRates->Brk1 * ;
-                        ( TaxRates->Brk1Rate / 100 )
+                    nTax := ( npaya - TaxRates->Brk1 ) * ( TaxRates->Brk2Rate/100 )
+                    nTax += TaxRates->Brk1 * ( TaxRates->Brk1Rate / 100 )
                 CASE npaya <= TaxRates->Brk1                   // Less $ 9,500
                     nTax := npaya * ( TaxRates->Brk1Rate / 100 )
                 ENDCASE
                 nTax := ( ( Int( ( nTax ) / .52 ) ) / 100 )
-                // * Divide by 52 for weekly tax - discard part cents (round down)
+                // Divide by 52 for weekly tax - discard part cents (round down)
 
                 IF Empty( ctaxcode )     // No declaration - 45% plus ELP
                     ntax := npaya * 0.45
@@ -1335,7 +1321,7 @@ FUNCTION MetTime()
                 IF SubStr( Name->taxcode, 1, 1 ) == "S"     // Secondary employment
                     // **   ntax := INT( npay )*( TaxRates->ElpRate/100 )         // 0.21+0.013
                     ntax := nTotPay * ( TaxRates->Sec_Rate / 100 )   // 0.221
-                    // * Secondary is flat 22.1% + ELP rate on whole dollars
+                    // Secondary is flat 22.1% + ELP rate on whole dollars
                 ENDIF
                 IF Name->Hol_Pay                                   // Holiday Pay
                     ntax := ntax * 3

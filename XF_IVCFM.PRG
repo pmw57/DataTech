@@ -585,7 +585,8 @@ FUNCTION InvForm( mcodeno )
 // *-------------------------------------------------------------------
 
 FUNCTION IvcLook( minvno )
-
+    local discountAmount
+    
     aPart_ := {}
     nivcTotal := 0
     SELECT Invoice
@@ -602,15 +603,15 @@ FUNCTION IvcLook( minvno )
         SELECT Part
         SEEK Invoice->Partnum
         SELECT Invoice
-        mA := ( ( Invoice->Amount * ( 1 -Invoice->Discount / 100 ) * 100 ) / 100 );
-            // Invoice->Qty
+        discountAmount := Invoice->Amount * ( 1 -Invoice->Discount / 100 )
+        mA := ( discountAmount * 100 ) / 100 * Invoice->Qty
         ncnt++
         AAdd( aPart_, SubStr( Part->Desc, 1,34 ) + " " + Str( Invoice->Qty, 8, 2 );
             + " " + Str( Invoice->Amount, 10, 2 ) + " " + Str( Invoice->Discount );
             + "%" + Str( mA, 10, 2 ) )
         // **         STR( Recno(),6 )
-        nivcTotal := ( nivcTotal + ( ( Invoice->Amount * ( 1 -Invoice->Discount / 100 );
-            // 100 )/100 )*Invoice->Qty )
+        discountAmount := Invoice->Amount * ( 1 -Invoice->Discount / 100 )
+        nivcTotal := ( nivcTotal + ( ( discountAmount * 100 )/100 )*Invoice->Qty )
         SKIP ALIAS Invoice
     ENDDO
     SET ORDER TO 1                  // Invno+Partnum

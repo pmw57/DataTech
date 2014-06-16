@@ -704,6 +704,7 @@ FUNCTION OrdEdit( mordnum )
 // *-------------------------------------------------------------------
 
 FUNCTION OrdScrn( mordnum )
+    local mArea
 
     Scroll()
     mtotal := mordtot := 0
@@ -743,8 +744,8 @@ FUNCTION OrdScrn( mordnum )
             CASE Part->Unit = "Mtr  "
                 mtotal := ( Part->Trade * Orders->Length ) * Orders->Partqty
             CASE Part->Unit = "Sq Mtr "
-                mtotal := ( ( Part->Trade / ( Part->Width / 1000 );
-                    // Part->Length ) )*Orders->Partqty
+                mArea := Part->Width * Part->Length
+                mtotal := ( Part->Trade / mArea / 1000 ) * Orders->Partqty
             ENDCASE
             SELECT Orders
             cunit := Space( 10 )

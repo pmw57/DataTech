@@ -103,6 +103,7 @@ FUNCTION IvcText()
 // *---------------------------------------------------------------------*
 
 FUNCTION ProfNated()
+    local discountCost
 
     cheading  := "View  Existing  Suppliers"
     mcontinue := mdelete := mok := "Y"
@@ -135,8 +136,8 @@ FUNCTION ProfNated()
                 SELECT Part
                 SEEK ProfNat->Partnum
                 SELECT ProfNat
-                ntotal += ProfNat->Qty;
-                    // ( ( ProfNat->Cost*( 1-ProfNat->Discount/100 )*100 )/100 )
+                discountCost := ( ( ProfNat->Cost*( 1-ProfNat->Discount/100 )*100 )/100 )
+                ntotal += ProfNat->Qty * discountCost
                 AAdd( aPart_, ProfNat->Codeno + " " + Str( Qty,8,2 );
                     + " " + SubStr( ProfNat->Partnum, 1, 8 );
                     + " " + SubStr( Part->Desc, 1, 19 );

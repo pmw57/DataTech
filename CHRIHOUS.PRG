@@ -386,8 +386,7 @@ TAKEN OUT
          PartSer->Serno    := LTRIM( mserno )
          PartSer->PDate    := Debit->DBDate
          PartSer->BranchId := Debit->BranchId
-         PartSer->Amount   := ( Invoice->Amount*(1-Invoice->Discount/100 );
-                                *100 ) /100.00
+         PartSer->Amount   := ( Invoice->Amount*(1-Invoice->Discount/100 )*100 ) /100.00
          UNLOCK
          nSerqty := nSerqty-1
          mserno  := STR( VAL( mserno )+1,15 )

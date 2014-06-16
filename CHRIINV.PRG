@@ -974,8 +974,8 @@ taken out
         SEEK Debit->Invno
         DO WHILE Invoice->Invno == Debit->Invno .AND. Invoice->( !Eof() )
             SELECT Invoice
-            ngtotal  += ( Invoice->Qty * ( ( Invoice->Amount;
-                // ( 1-Invoice->Discount/100 )*100 )/100 ) )
+            ngtotal  += ( Invoice->Qty * ( ( Invoice->Amount *;
+                ( 1-Invoice->Discount/100 )*100 )/100 ) )
             mpartnum := Invoice->Partnum
             SELECT Part
             SEEK mpartnum

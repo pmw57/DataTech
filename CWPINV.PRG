@@ -9,7 +9,8 @@
 // (c) Copyright 1993 by Kirby Christchurch.
 
 FUNCTION WBInvAdd( mcodeno )
-
+    local discountAmount
+    
     cappend := "N"
     mcontinue := mok := "Y"
     DO WHILE mcontinue == "Y"
@@ -205,8 +206,8 @@ FUNCTION WBInvAdd( mcodeno )
         SEEK Debit->Invno
         DO WHILE Invoice->Invno == Debit->Invno .AND. Invoice->( !Eof() )
             SELECT Invoice
-            ngtotal  += ( Invoice->Qty * ( ( Invoice->Amount;
-                // ( 1-Invoice->Discount/100 )*100 )/100 ) )
+            discountAmount := Invoice->Amount * ( 1 - Invoice->Discount / 100 )
+            ngtotal  += ( Invoice->Qty * ( ( discountAmount * 100 )/100 ) )
             mpartnum := Invoice->Partnum
             SELECT Part
             SEEK mpartnum

@@ -1134,6 +1134,7 @@ FUNCTION QPuotOperLst()
 // **---------------------------------------------------------------------*
 
 FUNCTION QPuotProf()
+    local discountAmount
 
     Scroll()
     DispBox( 0, 1, 18, 79, 2 )
@@ -1253,8 +1254,8 @@ FUNCTION QPuotProf()
             SELECT Part
             SEEK Quot->Partnum
             SELECT Quot
-            mA := ( ( Quot->Amount * ( 1 -Quot->Discount / 100 ) * 100 ) / 100 );
-                // Quot->OrgQty
+            discountAmount := Quot->Amount * ( 1 - Quot->Discount / 100 )
+            mA := ( discountAmount * 100 ) / 100 * Quot->OrgQty
             ntrade    := Part->Trade * Quot->OrgQty
             nsale     += mA
             ncostitem += ntrade
