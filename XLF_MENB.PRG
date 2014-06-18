@@ -113,7 +113,7 @@ FUNCTION MenuB2()
         MENU TO nselect
         DO CASE
         CASE nselect == 10
-            SELECT MenuDBFC
+            SELECT MenuDBFB
             ApFLock( 3 )
             @  3, 38 GET MenuDBFB->Menu_A1 PICTURE "@X"
             @  5, 38 GET MenuDBFB->Menu_A2 PICTURE "@X"
@@ -300,7 +300,7 @@ FUNCTION MenuB3()
         MENU TO nselect
         DO CASE
         CASE nselect == 10
-            SELECT MenuDBFC
+            SELECT MenuDBFB
             ApFLock( 3 )
             @  3, 38 GET MenuDBFB->Menu_D1 PICTURE "@X"
             @  5, 38 GET MenuDBFB->Menu_D2 PICTURE "@X"
