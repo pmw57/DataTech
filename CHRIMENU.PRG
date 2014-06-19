@@ -111,7 +111,7 @@ FUNCTION MENU()
         Lastused( nl )                                 // _Init.PRG
         @ 22, 43 -( Len( Note->Note ) / 2 ) SAY Note->Note      // COLOR "RG+"
         mtitle2 := "Daemon Solutions  Ph  027 238 6458"
-        @ 24, 3 SAY "** CP1-23052014-2 "
+        @ 24, 3 SAY "** CP1-20062014 "
         @ 24, 43 -( Len( mtitle2 ) / 2 ) SAY mtitle2 COLOR "GB+"
         MENU TO nselect
         DO CASE
